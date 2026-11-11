@@ -18,7 +18,7 @@
 ## الكود
 - كل الكود بـ `Assets/_EchoStation/Scripts/`، بـ namespace `EchoStation.*`.
 - **Input System الجديد** (`UnityEngine.InputSystem`).
-- السكربتات الموجودة: `AliController`، `Flashlight`، `Interactor`، `EchoPulse`، `EchoSurface`، `LoopCorridor`، `TurnBackTrigger`، `AnomalyDirector`، `LivingTape`. لازم Layers باسم `Player` و`Hallucination` (والثاني مستثنى من `EchoPulse.echoLayers`)، ومادة للنبضة (URP Particles Unlit، Transparent، Additive). انكتبت بدون ما تنجرّب داخل Unity، فأول شي: افتح المشروع، صلّح أي خطأ يطلع بالـ Console، وجرّب.
+- السكربتات الموجودة: `AliController`، `Flashlight`، `Interactor`، `EchoPulse`، `EchoSurface`، `LoopCorridor`، `TurnBackTrigger`، `AnomalyDirector`، `LivingTape`، `OldMediaFilter` (راديو/لاسلكي/شريط). وأداة `tools/oldmedia.sh` تحوّل أي تسجيل لصوت راديو أو شريط. لازم Layers باسم `Player` و`Hallucination` (والثاني مستثنى من `EchoPulse.echoLayers`)، ومادة للنبضة (URP Particles Unlit، Transparent، Additive). انكتبت بدون ما تنجرّب داخل Unity، فأول شي: افتح المشروع، صلّح أي خطأ يطلع بالـ Console، وجرّب.
 
 ## الأسبوع الأول (من خطة البناء)
 1. **ممر رمادي** بـ ProBuilder: 14 متر طول، و1.8 متر عرض، وزاوية عمياء 90 درجة، وباب A وباب B.
