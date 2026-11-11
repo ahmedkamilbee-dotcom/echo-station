@@ -9,8 +9,8 @@
 
 - [x] 1. **(HDRP) أداة بناء الممر الرمادي** → `Editor/DemoGreyboxBuilder.cs` (قائمة EchoStation > Build Greybox Demo) (Editor script): قائمة `EchoStation > Build Greybox Corridor` تبني الممر 14×1.8 م، والزاوية العمياء، والبابين، والمخزن، والـ Anchors، والـ Triggers، وعلي (CharacterController + كاميرا + مصباح + Pulse + Interactor)، والمسجّل، والـ Layers. حتى صاحب اللعبة يجرّب بكبسة وحدة.
 - [x] 2. **المولّد** → `World/GeneratorPower.cs`. **المولّد** (`GeneratorPower`): همهمة الأمان، والنيون مربوط بيه، وحدث الانقطاع (3 ثواني صمت) والرجوع، و`AudioMixer` snapshots.
-- [ ] 3. **القاتل** (`KillerController`): لقاءات مبرمجة على NavMesh، يسمع النبضة والخطوات (`EchoPulse.OnPulse`)، وحالات: يتمشى / يشك (نَفَسه يختفي) / يدوّر / يمسك. ما يركض ولا يصيّح.
-- [ ] 4. **التخبّي وحبس النفس** (`HidingSpot`, `BreathHold`): تحت الميز والمشبّك، وضغط مستمر (أو كبسة من الإعدادات)، والشاشة تعتم، ودگات القلب.
+- [x] 3. → `Killer/KillerController.cs`. **القاتل** (`KillerController`): لقاءات مبرمجة على NavMesh، يسمع النبضة والخطوات (`EchoPulse.OnPulse`)، وحالات: يتمشى / يشك (نَفَسه يختفي) / يدوّر / يمسك. ما يركض ولا يصيّح.
+- [x] 4. → `Player/HidingSpot.cs`, `Player/BreathHold.cs` (Space). **التخبّي وحبس النفس** (`HidingSpot`, `BreathHold`): تحت الميز والمشبّك، وضغط مستمر (أو كبسة من الإعدادات)، والشاشة تعتم، ودگات القلب.
 - [ ] 5. **مشهد المسكة** (`CaughtSequence`): 2-3 ثواني، شريط بالأذن، كتم الصوت، سواد، والرجوع لأول الغرفة.
 - [ ] 6. **السعلوة** (`SiluwaReflection`): تبين بالزجاج والانعكاس بس، وتختفي إذا اللاعب باوع مباشرة، وقطرة بلا ماي، وما تتحرك قدّام العين.
 - [ ] 7. **الطنطل** (`TantalStalker`): يتحرك بس بإطارات الرمش أو لما ما ينشاف، وأقرب كل مرة، وأصوات المكان تختفي وحدة وحدة.

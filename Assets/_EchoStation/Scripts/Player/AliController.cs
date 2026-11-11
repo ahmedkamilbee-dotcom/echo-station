@@ -39,6 +39,10 @@ namespace EchoStation.Player
         public bool InputEnabled { get; set; } = true;
         public bool IsMoving { get; private set; }
         public bool IsCrouching { get; private set; }
+        /// <summary>Set by HidingSpot while Ali is crouched inside a hiding place.</summary>
+        public bool IsHidden { get; set; }
+        /// <summary>Set by BreathHold while the player holds Ali's breath.</summary>
+        public bool BreathHeld { get; set; }
 
         CharacterController controller;
         float verticalVelocity;
