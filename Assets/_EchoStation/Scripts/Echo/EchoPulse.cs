@@ -39,7 +39,7 @@ namespace EchoStation.Echo
 
         public static event System.Action<Vector3, float> OnPulse;   // position, loudness radius
 
-        [Tooltip("Make in the Editor: URP/Particles/Unlit, Surface Transparent, Blend Additive.")]
+        [Tooltip("Make in the Editor: HDRP/Unlit, Surface Transparent, Blend Additive (enable Transparent Depth Prepass off).")]
         [SerializeField] Material pointMaterial;
 
         ParticleSystem points;
@@ -186,7 +186,7 @@ namespace EchoStation.Echo
 
             var renderer = go.GetComponent<ParticleSystemRenderer>();
             if (pointMaterial != null) renderer.material = pointMaterial;
-            else Debug.LogWarning("[EchoPulse] Assign Point Material (URP Particles Unlit, Transparent, Additive).", this);
+            else Debug.LogWarning("[EchoPulse] Assign Point Material (HDRP/Unlit, Transparent, Additive).", this);
             points.Play();
         }
     }

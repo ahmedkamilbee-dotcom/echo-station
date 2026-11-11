@@ -1,6 +1,6 @@
 # محطة الصدى: دليل Claude
 
-لعبة رعب نفسي عراقية، بمنظور الشخص الأول، بالأهوار سنة 1994. **Unity 6 + URP**، للـ PC، **أوفلاين**، عربي وإنگليزي. فريق من 3، وصاحب اللعبة يبرمج ويا Claude Code. **ميزانية صفر.**
+لعبة رعب نفسي عراقية، بمنظور الشخص الأول، بالأهوار سنة 1994. **Unity 6 + HDRP** (أقوى جرافيكس، ويا 3 مستويات جودة)، للـ PC، **أوفلاين**، عربي وإنگليزي. فريق من 3، وصاحب اللعبة يبرمج ويا Claude Code. **ميزانية صفر.**
 
 ## اقرأ قبل أي شغل
 1. `docs/story-bible.md`: قسم **"قرارات صاحب اللعبة"** بأوله يتقدّم على كلشي.
@@ -15,10 +15,15 @@
 - **الحساسية:** أهل الأهوار ما يكونون مصدر الرعب أبداً، ولا صور سياسية، والأذان ما يتشوّه.
 - **حساسية الضوء:** الرمش ما يتعدى 3 ومضات بالثانية، ويحترم `Flashlight.ReduceFlashing`.
 
+## الجرافيكس (القرار 33)
+- **HDRP** على Unity 6. جهاز التطوير: Quadro P5200 (بدون Ray Tracing، فلا نعتمد عليه).
+- **3 مستويات جودة** (Low / Medium / High): الضباب الحجمي، والظلال، و SSR تنزل بالمستويات الواطية.
+- أدوات HDRP المهمة: **Volumetric Fog** (Local Volumetric Fog بكل غرفة)، و**Physically Based Sky** للهور، و**Decals** للطين والصدأ، و**Water System** لماي الهور والقاعة، و**Exposure** ثابت (الظلام لازم يبقى ظلام).
+
 ## الكود
 - كل الكود بـ `Assets/_EchoStation/Scripts/`، بـ namespace `EchoStation.*`.
 - **Input System الجديد** (`UnityEngine.InputSystem`).
-- السكربتات الموجودة: `AliController`، `Flashlight`، `Interactor`، `EchoPulse`، `EchoSurface`، `LoopCorridor`، `TurnBackTrigger`، `AnomalyDirector`، `LivingTape`، `OldMediaFilter` (راديو/لاسلكي/شريط). وأداة `tools/oldmedia.sh` تحوّل أي تسجيل لصوت راديو أو شريط. لازم Layers باسم `Player` و`Hallucination` (والثاني مستثنى من `EchoPulse.echoLayers`)، ومادة للنبضة (URP Particles Unlit، Transparent، Additive). انكتبت بدون ما تنجرّب داخل Unity، فأول شي: افتح المشروع، صلّح أي خطأ يطلع بالـ Console، وجرّب.
+- السكربتات الموجودة: `AliController`، `Flashlight`، `Interactor`، `EchoPulse`، `EchoSurface`، `LoopCorridor`، `TurnBackTrigger`، `AnomalyDirector`، `LivingTape`، `OldMediaFilter` (راديو/لاسلكي/شريط). وأداة `tools/oldmedia.sh` تحوّل أي تسجيل لصوت راديو أو شريط. لازم Layers باسم `Player` و`Hallucination` (والثاني مستثنى من `EchoPulse.echoLayers`)، ومادة للنبضة (HDRP/Unlit، Transparent، Additive). انكتبت بدون ما تنجرّب داخل Unity، فأول شي: افتح المشروع، صلّح أي خطأ يطلع بالـ Console، وجرّب.
 
 ## الأسبوع الأول (من خطة البناء)
 1. **ممر رمادي** بـ ProBuilder: 14 متر طول، و1.8 متر عرض، وزاوية عمياء 90 درجة، وباب A وباب B.

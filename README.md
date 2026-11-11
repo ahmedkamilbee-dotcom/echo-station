@@ -1,7 +1,7 @@
 # محطة الصدى · Echo Station
 
 لعبة رعب نفسي عراقية بمنظور الشخص الأول. الأهوار، كانون الثاني 1994.
-**Unity 6 (URP) · PC (Steam و itch.io) · أوفلاين · عربي وإنگليزي · فريق من 3 · ميزانية صفر**
+**Unity 6 (HDRP) · PC (Steam و itch.io) · أوفلاين · عربي وإنگليزي · فريق من 3 · ميزانية صفر**
 
 > **القاعدة الذهبية:** العين تكذب... الصدى ما يكذب.
 
@@ -18,7 +18,7 @@
 
 ## شلون تبدي (على اللابتوب)
 1. نزّل **Unity Hub**، وبيه **Unity 6 LTS**، ويا **Windows Build Support** و**Visual Studio Community**.
-2. بالـ Hub: **New project ← Universal 3D (URP)**، واسمه `EchoStation`، **وبمكان مؤقت**.
+2. بالـ Hub: **New project ← High Definition 3D (HDRP)**، واسمه `EchoStation`، **وبمكان مؤقت**.
 3. سكّر Unity. انسخ كل محتويات مشروع Unity الجديد (`Assets`، `Packages`، `ProjectSettings`) **داخل مجلد هذا الريبو** (يندمج ويا `Assets/_EchoStation`).
 4. افتح المجلد من Unity Hub (Add ← المجلد).
 5. من **Window ← Package Manager** نزّل: **ProBuilder**، **Cinemachine**، **Input System**، **AI Navigation**. وإذا سألك يفعّل Input System الجديد، گول **Yes**.
