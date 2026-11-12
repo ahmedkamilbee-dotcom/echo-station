@@ -12,7 +12,7 @@ namespace EchoStation.Player
     [RequireComponent(typeof(Light))]
     public class Flashlight : MonoBehaviour
     {
-        [SerializeField] float maxIntensity = 6f;
+        [SerializeField] float maxIntensity = 800f;   // HDRP physical units (lumens)
         [SerializeField] Color freshColor = new Color(1f, 0.97f, 0.88f);
         [SerializeField] Color drainedColor = new Color(1f, 0.72f, 0.42f);
         [SerializeField, Range(0f, 1f)] float battery = 1f;

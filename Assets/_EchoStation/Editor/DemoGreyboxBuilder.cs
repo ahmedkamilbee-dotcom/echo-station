@@ -163,7 +163,7 @@ namespace EchoStation.EditorTools
         static void HazardLight(Transform parent, Vector3 local)
         {
             var go = new GameObject("Hazard"); go.transform.SetParent(parent, false); go.transform.localPosition = local;
-            var l = go.AddComponent<Light>(); l.type = LightType.Point; l.color = new Color(1f, 0.55f, 0.15f); l.range = 8; l.intensity = 200;
+            var l = go.AddComponent<Light>(); l.type = LightType.Point; l.color = new Color(1f, 0.55f, 0.15f); l.range = 8; l.intensity = 1600;
             if (!go.GetComponent<HDAdditionalLightData>()) go.AddComponent<HDAdditionalLightData>();
         }
 
@@ -284,7 +284,7 @@ namespace EchoStation.EditorTools
             void Point(string n, Vector3 p, Color c, float range, float intensity)
             {
                 var go = new GameObject(n); go.transform.SetParent(l); go.transform.position = p;
-                var li = go.AddComponent<Light>(); li.type = LightType.Point; li.color = c; li.range = range; li.intensity = intensity;
+                var li = go.AddComponent<Light>(); li.type = LightType.Point; li.color = c; li.range = range; li.intensity = intensity * 8f;   // HDRP physical units
                 li.shadows = LightShadows.Soft;
                 if (!go.GetComponent<HDAdditionalLightData>()) go.AddComponent<HDAdditionalLightData>();
             }
@@ -307,7 +307,7 @@ namespace EchoStation.EditorTools
             fog.enableVolumetricFog.Override(true);
             var exp = profile.Add<Exposure>(true);
             exp.mode.Override(ExposureMode.Fixed);
-            exp.fixedExposure.Override(5.5f);       // darkness stays dark
+            exp.fixedExposure.Override(1.5f);       // dark, but readable; tune per room
             AssetDatabase.CreateAsset(profile, Root + "/Scenes/Demo_Greybox_Volume.asset");
             v.sharedProfile = profile;
         }
