@@ -19,9 +19,9 @@
 - [x] 10. → `Puzzles/` (`PuzzleBase` ويا سلّم المساعدة، و`ClockPuzzle`، و`KnockRhythmPuzzle`، و`CassetteFlipPuzzle`، و`MuffledSearchPuzzle`، و`RadioChannelPuzzle`). **الألغاز الخمسة** (`ClockPuzzle`, `KnockRhythmPuzzle`, `CassetteFlipPuzzle`, `MuffledSearchPuzzle`, `RadioChannelPuzzle`) ويا سلّم المساعدة بلا واجهة.
 - [x] 11. → `Puzzles/SecretTracker.cs`. **الأسرار الأربعة** (`SecretTracker`) والكاسيت الخامس وتأثيره على جملة خلف.
 - [x] 12. → `World/CarEnding.cs` (+ `World/Subtitles.cs` نسخة مبدئية). **النهاية** (`CarEnding`): السيارة، والقفل، والطنطل، والأذان، وثلاث دگات، وخلف (نص وجه)، والاستكان، والسواد، والاسم، وبطاقة قائمة الأمنيات.
-- [ ] 13. **الترجمة** (`Subtitles`, `Localization`): عربي وإنگليزي، صغيرة وبلا اسم المتكلم، ودعم RTL (RTLTMPro، رخصته MIT، يتأكد منها).
+- [x] 13. → `World/Subtitles.cs` (TMP، و RTLTMPro للعربي)، و`World/LineTable.cs`، و`Data/lines.json` (مستخرج من سيناريو سجاد). **الترجمة** (`Subtitles`, `Localization`): عربي وإنگليزي، صغيرة وبلا اسم المتكلم، ودعم RTL (RTLTMPro، رخصته MIT، يتأكد منها).
 - [x] 14. → `UI/GameMenus.cs` (الشاشات تنبني بالمشهد وتنربط). **القوائم** (`WarningScreen`, `PauseMenu`, `OptionsMenu`): تحذير حساسية الضوء، وتقليل الوميض، وحساسية الماوس، والترجمة، وحبس النفس بكبسة.
 - [ ] 16. **خامات مصنوعة بالكود** (Editor script `ProceduralTextures`): كونكريت مبلول، وصبغ حكومي بيج مقشّر، وحديد مصدّي، وطين مفطّر، وماي، وقصب. PNG بـ `Assets/_EchoStation/Art/Generated/` ومواد HDRP/Lit جاهزة.
 - [ ] 17. **موديلات بسيطة بالكود** (Editor script `ProceduralProps`): حزم قصب، ومسجّل كاسيت، واستكان چاي، ومصطبة، وساعة حايط، وتقويم، ولوحة سيطرة، وبرميل، وفانوس، ومشبّك حديد. و"إنسان رمادي" للقاتل وخلف (low-poly) حتى يتبدل بموديل MakeHuman/Mixamo.
-- [ ] 18. **مدير الأجواء الصوتية** (`AmbienceDirector`) حسب `docs/team/sound-study.md`: طبقة الخوف الواطية (−30 → −18 dB قبل الأحداث)، و Reverb Zones لكل غرفة، والهمس بأذن وحدة، وأصوات "مكان ثاني" عشوائية، وصنع الأصوات الناقصة بالكود.
+- [x] 18. → `Audio/AmbienceDirector.cs`. **مدير الأجواء الصوتية** (`AmbienceDirector`) حسب `docs/team/sound-study.md`: طبقة الخوف الواطية (−30 → −18 dB قبل الأحداث)، و Reverb Zones لكل غرفة، والهمس بأذن وحدة، وأصوات "مكان ثاني" عشوائية، وصنع الأصوات الناقصة بالكود.
 - [ ] 15. **دليل تركيب المشهد** (`docs/scene-setup.md`): خطوات بالعربي لربط كل السكربتات بالمشهد وتجربة الديمو من أوله لآخره.

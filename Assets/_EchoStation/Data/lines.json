@@ -1,0 +1,224 @@
+{
+ "lines": [
+  {
+   "code": "C01",
+   "ar": "...اعترف... وترتاح.",
+   "en": "...Confess... and rest."
+  },
+  {
+   "code": "A01",
+   "ar": "والله ما سويتها أستاذ.",
+   "en": "I swear I didn't do it, sir."
+  },
+  {
+   "code": "A02",
+   "ar": "چنت بالبيت... أمي تشهد.",
+   "en": "I was home... my mother will swear to it."
+  },
+  {
+   "code": "A02b",
+   "ar": "گلتلك كلشي أستاذ... شنو بعد أگول؟",
+   "en": "I told you everything, sir... what else is there?"
+  },
+  {
+   "code": "A03",
+   "ar": "أستاذ، شكد صارلي هنا؟",
+   "en": "Sir, how long have I been here?"
+  },
+  {
+   "code": "A04",
+   "ar": "ساعة؟ ساعتين؟... ضيّعت الوقت.",
+   "en": "An hour? Two?... I've lost track of time."
+  },
+  {
+   "code": "A05",
+   "ar": "أنام شوية وأحچي. والله أحچي.",
+   "en": "Let me sleep a bit and I'll talk. I swear."
+  },
+  {
+   "code": "A06",
+   "ar": "شكد الساعة أستاذ؟",
+   "en": "What time is it, sir?"
+  },
+  {
+   "code": "A08",
+   "ar": "الصايغ؟ أعرفه من بعيد... عمري ما دخلت دكانه.",
+   "en": "The goldsmith? I knew him by sight... I never set foot in his shop."
+  },
+  {
+   "code": "A09",
+   "ar": "...منو؟",
+   "en": "...Who is it?"
+  },
+  {
+   "code": "A11",
+   "ar": "ماي... بس شوية ماي. حلگي ناشف.",
+   "en": "Water... just a little water. My throat's dry."
+  },
+  {
+   "code": "A12",
+   "ar": "أمي... أمي ما تدري وين أني.",
+   "en": "My mother... my mother doesn't know where I am."
+  },
+  {
+   "code": "A14",
+   "ar": "لا تنطيني چاي بعد أستاذ. الچاي ما يخليني أنام.",
+   "en": "No more tea, sir. The tea won't let me sleep."
+  },
+  {
+   "code": "A15",
+   "ar": "ليلة جابوني... تركوني بالسيارة وحدي. ساعة كاملة. وچنت أسمع شي يمشي بالقصب... ويوگف لما أوگف.",
+   "en": "The night they brought me in... they left me alone in the car. A whole hour. Something was walking in the reeds... it stopped when I stopped."
+  },
+  {
+   "code": "A16",
+   "ar": "أستاذ... الضوه يوجّع عيني.",
+   "en": "Sir... the light hurts my eyes."
+  },
+  {
+   "code": "D-rep",
+   "ar": "مكتوم. أعيد: مكتوم.",
+   "en": "Muffled. Repeat: muffled."
+  },
+  {
+   "code": "E01",
+   "ar": "استلمنا.",
+   "en": "Received."
+  },
+  {
+   "code": "D-majid1",
+   "ar": "أني بس قريت الخطوط. الخط المكتوم يعني ناس... بس قريتها.",
+   "en": "I only read the lines. A muffled line means people... I only read it."
+  },
+  {
+   "code": "D-jabbar1",
+   "ar": "أني شغّلت السماعة بس. ما سمعت شي... ما سمعت.",
+   "en": "I only ran the speaker. I heard nothing... nothing."
+  },
+  {
+   "code": "D-nouri1",
+   "ar": "المضخات ما تسأل منو بالقصب... أني بس شغّلتها.",
+   "en": "Pumps don't ask who's in the reeds... I only ran them."
+  },
+  {
+   "code": "D-hasan1",
+   "ar": "أني بلّغت الإحداثيات... بس الأرقام، بس—",
+   "en": "I reported the coordinates... only numbers, only—"
+  },
+  {
+   "code": "E03",
+   "ar": "النبضة الجاية... خمسة وسبعة وأربعين.",
+   "en": "Next pulse... five forty-seven."
+  },
+  {
+   "code": "A18",
+   "ar": "زين... زين أستاذ. أني سويتها. بس خليني أنام.",
+   "en": "Okay... okay, sir. I did it. Just let me sleep."
+  },
+  {
+   "code": "A19",
+   "ar": "رجعت أستاذ؟",
+   "en": "You're back, sir?"
+  },
+  {
+   "code": "E04",
+   "ar": "...المحطة سبعة... المحطة سبعة، ماكو جواب. أعيد...",
+   "en": "...Station Seven... Station Seven, no answer. Repeat..."
+  },
+  {
+   "code": "E05",
+   "ar": "...جثة عريف بصريفة مهجورة... ساعته واقفة على خمسة وسبعة وأربعين...",
+   "en": "...a corporal's body in an abandoned reed hut... his watch stopped at five forty-seven..."
+  },
+  {
+   "code": "B01",
+   "ar": "هنا البرج ثلاثة... الصدى... مـ... مكتوم.",
+   "en": "Tower three here... the echo... m-... muffled."
+  },
+  {
+   "code": "E02",
+   "ar": "كل المحطات... تحوّل للقناة أربعة... أربعة.",
+   "en": "All stations... switch to channel four... four."
+  },
+  {
+   "code": "D-majid-r",
+   "ar": "الخريطة تأشّر... الخط الشمالي مكتوم.",
+   "en": "The chart shows... northern line, muffled."
+  },
+  {
+   "code": "D-jabbar-r",
+   "ar": "السماعة ثلاثة أطلقت. الصدى... مكتوم.",
+   "en": "Speaker three fired. Echo... muffled."
+  },
+  {
+   "code": "D-nouri-r",
+   "ar": "وصلني مكتوم. المضخات تشتغل لحد الصبح.",
+   "en": "Got 'muffled'. Pumps run till morning."
+  },
+  {
+   "code": "D-hasan-r",
+   "ar": "...الاتجاه الجنوبي... مكتوم.",
+   "en": "...southern bearing... muffled."
+  },
+  {
+   "code": "K01",
+   "ar": "وين چنت أستاذ؟",
+   "en": "Where were you, sir?"
+  },
+  {
+   "code": "K02",
+   "ar": "ساعة كاملة أدوّر عليك.",
+   "en": "A whole hour I've been looking for you."
+  },
+  {
+   "code": "K03",
+   "ar": "چـ... چنت... چنت تصيّح. سمعتك من بعيد.",
+   "en": "You were... you were screaming. I heard you from far off."
+  },
+  {
+   "code": "K04",
+   "ar": "طنطل.",
+   "en": "Tantal."
+  },
+  {
+   "code": "K05",
+   "ar": "البطارية أستاذ.",
+   "en": "The battery, sir."
+  },
+  {
+   "code": "K06",
+   "ar": "هذا... مالك أستاذ.",
+   "en": "This... is yours, sir."
+  },
+  {
+   "code": "B-test-clean",
+   "ar": "فحص... واحد، اثنين، ثلاثة.",
+   "en": "Testing... one, two, three."
+  },
+  {
+   "code": "A13",
+   "ar": "...ـو وياك بالممر.",
+   "en": "...e's in the corridor with you."
+  },
+  {
+   "code": "A10",
+   "ar": "لا تفتحله أستاذ.",
+   "en": "Don't open for him, sir."
+  },
+  {
+   "code": "D-hasan-m1",
+   "ar": "مـكـتـوم.",
+   "en": "[m u f f l e d]"
+  },
+  {
+   "code": "D-shatt",
+   "ar": "الشط.",
+   "en": "[...the river.]"
+  },
+  {
+   "code": "B-test",
+   "ar": "فحص... واحد، اثنين، ثلاثة.",
+   "en": "Testing... one, two, three."
+  }
+ ]
+}
