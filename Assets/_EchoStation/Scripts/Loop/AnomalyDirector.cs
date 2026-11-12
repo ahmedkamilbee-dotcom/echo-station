@@ -39,6 +39,13 @@ namespace EchoStation.Loop
         /// <summary>Walking forward is wrong only when the current anomaly asks you to turn back.</summary>
         public bool ForwardPassIsCorrect() => current == null || !current.requiresTurnBack;
 
+        /// <summary>DemoClock: if the player is late, drop the "empty" and "spare" steps that are still ahead.</summary>
+        public void RemoveEmptyStepsAfter(int step)
+        {
+            for (int i = sequence.Count - 1; i > step; i--)
+                if (sequence[i].id == "empty" || sequence[i].id == "spare") sequence.RemoveAt(i);
+        }
+
         public void ApplyStep(int step)
         {
             foreach (var a in sequence) Set(a, false);

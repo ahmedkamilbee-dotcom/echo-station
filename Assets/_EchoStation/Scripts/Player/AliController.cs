@@ -37,6 +37,7 @@ namespace EchoStation.Player
 
         /// <summary>When false, input is ignored (used by scripted moments).</summary>
         public bool InputEnabled { get; set; } = true;
+        public static float SensitivityScale = 1f;   // from the options menu
         public bool IsMoving { get; private set; }
         public bool IsCrouching { get; private set; }
         /// <summary>Set by HidingSpot while Ali is crouched inside a hiding place.</summary>
@@ -80,7 +81,7 @@ namespace EchoStation.Player
                     Vector3.up, out _, standHeight - controller.radius * 2f, ~LayerMask.GetMask("Player"), QueryTriggerInteraction.Ignore);
                 IsCrouching = wantCrouch || (IsCrouching && blocked);
 
-                Vector2 delta = mouse.delta.ReadValue() * mouseSensitivity;
+                Vector2 delta = mouse.delta.ReadValue() * mouseSensitivity * SensitivityScale;
                 targetYaw += delta.x;
                 targetPitch = Mathf.Clamp(targetPitch - delta.y, -maxPitch, maxPitch);
             }

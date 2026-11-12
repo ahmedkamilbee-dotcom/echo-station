@@ -64,6 +64,9 @@ namespace EchoStation.Loop
             Advance();
         }
 
+        /// <summary>Used by DemoClock when the player lingers too long in one loop.</summary>
+        public void ForceAdvance() { if (!broken) Advance(); }
+
         void Advance()
         {
             Step++;
