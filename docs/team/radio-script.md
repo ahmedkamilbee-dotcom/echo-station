@@ -22,9 +22,9 @@
 
 ### R01: افتتاح البرنامج (20 ث)
 **م:**
-> "مستمعينا الكرام، مساء الخير... وأهلاً بكم في برنامج **ليل الجنوب**، من إذاعة البصرة. الساعة الآن... الرابعة وخمسون دقيقة، فجر الثاني عشر من كانون الثاني. والجو بارد، والضباب كثيف على طريق العمارة... فانتبهوا، رحمكم الله."
+> "مستمعينا الكرام، مساء الخير... وأهلاً بكم في برنامج **ليل الجنوب**، من إذاعة البصرة. الساعة الآن... الرابعة وخمسون دقيقة، فجر التاسع من كانون الثاني. والجو بارد، والضباب كثيف على طريق العمارة... فانتبهوا، رحمكم الله."
 
-EN: *"Good evening, dear listeners, and welcome to Southern Night, from Basra radio. The time is now... four fifty, at dawn on the twelfth of January. It's cold, and the fog is thick on the Amarah road... so take care, God bless you."*
+EN: *"Good evening, dear listeners, and welcome to Southern Night, from Basra radio. The time is now... four fifty, at dawn on the ninth of January. It's cold, and the fog is thick on the Amarah road... so take care, God bless you."*
 
 ### R02: الخبر الأول، العريف (35 ث)
 **م:**
@@ -69,9 +69,9 @@ EN: *"The time is now... four fifty-two."*
 
 ### R06: الخبر يتكرر، بس غلط (30 ث)
 **م:**
-> "وفي أخبار الشرطة... عُثر فجر **الثاني عشر** من هذا الشهر... على جثة **رجل** في **محطة الضخ**... في **الممر**... الجثة كانت غارقة... مع إن الممر... ناشف. وساعته متوقفة على الخامسة وسبعة وأربعين... وجنبه جهاز تسجيل... ما زال يشتغل."
+> "وفي أخبار الشرطة... عُثر فجر **اليوم**، التاسع من هذا الشهر،... على جثة **رجل** في **محطة الضخ**... في **الممر**... الجثة كانت غارقة... مع إن الممر... ناشف. وساعته متوقفة على الخامسة وسبعة وأربعين... وجنبه جهاز تسجيل... ما زال يشتغل."
 
-EN: *"In police news... on the morning of the twelfth, the body of a man was found at the pumping station... in the corridor... drowned... though the corridor... was dry. His watch had stopped at five forty-seven... and beside him, a tape recorder... still running."*
+EN: *"In police news... this morning, the ninth, the body of a man was found at the pumping station... in the corridor... drowned... though the corridor... was dry. His watch had stopped at five forty-seven... and beside him, a tape recorder... still running."*
 
 > **الفكرة:** نفس R02 حرف بحرف، بس التاريخ صار **اليوم**، والمكان صار **الممر اللي اللاعب واگف بيه**. الجملة الأخيرة تخلّي اللاعب يباوع للمسجّل اللي جنبه.
 
@@ -111,7 +111,7 @@ EN: *"...our listener at the station. We know you can hear us. Go back to the re
 
 EN: *"We remind our listeners... in August, Majid. In October, Jabbar. In December, Nouri. On the seventh of January, Hassan. On the eleventh, Fadhil... And on the twelfth..." [4 seconds of static] "...muffled."*
 
-> **ليش مخيف:** حسن وفاضل ما انذكروا بالبث الطبيعي. والراديو هسه يعرف ضحايا بعدهم ما انلگوا. والسطر الأخير ما بيه اسم.
+> **ليش مخيف:** الليلة هي 9 كانون الثاني، وفاضل (11) بعده عايش. **الراديو يقرا أسماء ناس بعدهم ما ماتوا.** والسطر الأخير ما بيه اسم.
 
 ### R11: نهاية البث (10 ث)
 **م:**
