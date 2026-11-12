@@ -10,6 +10,7 @@ using EchoStation.Echo;
 using EchoStation.Haunt;
 using EchoStation.Loop;
 using EchoStation.Player;
+using EchoStation.World;
 
 namespace EchoStation.EditorTools
 {
@@ -44,11 +45,13 @@ namespace EchoStation.EditorTools
             world = new GameObject("WORLD").transform;
 
             BuildVolume();
-            var storeroom = Room("01_Storeroom", new Vector3(0, 0, -2.5f), new Vector3(4, 2.6f, 5), "concrete", EchoMaterial.Concrete, openZPlus: true);
-            Box("VestibuleA_Floor", new Vector3(0, -0.05f, 0.5f), new Vector3(1.8f, 0.1f, 1), "concrete", EchoMaterial.Concrete, storeroom.parent);
-            Box("VestibuleA_Ceil", new Vector3(0, 2.5f, 0.5f), new Vector3(2.0f, 0.1f, 1.1f), "concrete", EchoMaterial.Concrete, storeroom.parent);
-            Box("VestibuleA_WallL", new Vector3(-0.95f, 1.3f, 0.5f), new Vector3(0.1f, 2.6f, 1.1f), "paint", EchoMaterial.Concrete, storeroom.parent);
-            Box("VestibuleA_WallR", new Vector3(0.95f, 1.3f, 0.5f), new Vector3(0.1f, 2.6f, 1.1f), "paint", EchoMaterial.Concrete, storeroom.parent);
+            var storeroom = Room("01_Storeroom", new Vector3(0, 0, -4f), new Vector3(4, 2.6f, 5), "concrete", EchoMaterial.Concrete, openZPlus: true);
+            // Vestibule A: a sealed 2.5 m box between two doors. Vestibule B (after door B) is its exact twin: the loop swaps them.
+            Box("VestibuleA_Floor", new Vector3(0, -0.05f, -0.25f), new Vector3(1.8f, 0.1f, 2.5f), "concrete", EchoMaterial.Concrete, storeroom);
+            Box("VestibuleA_Ceil", new Vector3(0, 2.5f, -0.25f), new Vector3(2.0f, 0.1f, 2.6f), "concrete", EchoMaterial.Concrete, storeroom);
+            Box("VestibuleA_WallL", new Vector3(-0.95f, 1.3f, -0.25f), new Vector3(0.1f, 2.6f, 2.5f), "paint", EchoMaterial.Concrete, storeroom);
+            Box("VestibuleA_WallR", new Vector3(0.95f, 1.3f, -0.25f), new Vector3(0.1f, 2.6f, 2.5f), "paint", EchoMaterial.Concrete, storeroom);
+            Door("StoreDoor", new Vector3(-0.55f, 0, -1.5f), new Vector3(0.55f, 1.05f, 0), new Vector3(1.1f, 2.1f, 0.08f), Vector3.forward, -95f, storeroom);
             BuildCorridor(out Transform exitAnchor, out Transform entryAnchor, out BoxCollider loopTrigger);
             Room("04_Workshop", new Vector3(-2.9f, 0, 6.5f), new Vector3(4, 2.6f, 3), "concrete", EchoMaterial.Concrete, openXPlus: true);
             Room("05_ControlRoom", new Vector3(3.5f, 0, 16.6f), new Vector3(3, 2.6f, 3), "concrete", EchoMaterial.Concrete, openZMinus: true);
@@ -83,7 +86,8 @@ namespace EchoStation.EditorTools
             BuildLights();
             WireAnomalies(director);
             BuildAmbience();
-            BuildAli(new Vector3(0.6f, 0.05f, -3.2f));
+            DressStation();
+            BuildAli(new Vector3(0.6f, 0.05f, -4.7f));
 
             EditorSceneManager.SaveScene(scene, ScenePath);
             Debug.Log("[EchoStation] Greybox demo built: " + ScenePath + ". Press Play. WASD, mouse, Q flashlight, F echo pulse, E/R tape, Ctrl crouch.");
@@ -107,22 +111,34 @@ namespace EchoStation.EditorTools
             Box("Ceil2", new Vector3(4.45f, h, 14.1f), new Vector3(7.1f, 0.1f, w), "concrete", EchoMaterial.Concrete, c);
             Box("WallFar2a", new Vector3(1.925f, h / 2, 15.05f), new Vector3(2.05f, h, 0.1f), "paint", EchoMaterial.Concrete, c); // gap = control room door
             Box("WallFar2b", new Vector3(6.075f, h / 2, 15.05f), new Vector3(4.05f, h, 0.1f), "paint", EchoMaterial.Concrete, c);
-            Box("WallNear2", new Vector3(4.95f, h / 2, 13.15f), new Vector3(8.1f, h, 0.1f), "paint", EchoMaterial.Concrete, c);
-            Box("DoorB", new Vector3(8.05f, 1.05f, 14.1f), new Vector3(0.1f, 2.1f, 1.1f), "rust", EchoMaterial.Metal, c);
+            Box("WallNear2", new Vector3(4.45f, h / 2, 13.15f), new Vector3(7.1f, h, 0.1f), "paint", EchoMaterial.Concrete, c);
+            // Door A (vestibule A -> corridor) and door B (corridor -> vestibule B): real doors that open and shut behind you.
+            DoorFrame("FrameA", new Vector3(0, 0, 1.0f), false, c);
+            Door("DoorA", new Vector3(-0.55f, 0, 1.0f), new Vector3(0.55f, 1.05f, 0), new Vector3(1.1f, 2.1f, 0.08f), Vector3.forward, -95f, c);
+            DoorFrame("FrameB", new Vector3(8.05f, 0, 14.1f), true, c);
+            Door("DoorB", new Vector3(8.05f, 0, 14.65f), new Vector3(0, 1.05f, -0.55f), new Vector3(0.08f, 2.1f, 1.1f), Vector3.right, -95f, c);
+            // Vestibule B: twin of vestibule A. Its far door never opens: before you reach it you are already in A.
+            Box("VestibuleB_Floor", new Vector3(9.3f, -0.05f, 14.1f), new Vector3(2.5f, 0.1f, 1.8f), "concrete", EchoMaterial.Concrete, c);
+            Box("VestibuleB_Ceil", new Vector3(9.3f, 2.5f, 14.1f), new Vector3(2.6f, 0.1f, 2.0f), "concrete", EchoMaterial.Concrete, c);
+            Box("VestibuleB_WallL", new Vector3(9.3f, 1.3f, 15.05f), new Vector3(2.5f, 2.6f, 0.1f), "paint", EchoMaterial.Concrete, c);
+            Box("VestibuleB_WallR", new Vector3(9.3f, 1.3f, 13.15f), new Vector3(2.5f, 2.6f, 0.1f), "paint", EchoMaterial.Concrete, c);
+            DoorFrame("FrameB_Far", new Vector3(10.55f, 0, 14.1f), true, c);
+            Box("DoorB_Far_Shut", new Vector3(10.55f, 1.05f, 14.1f), new Vector3(0.08f, 2.1f, 1.1f), "rust", EchoMaterial.Metal, c);
+            Box("VestibuleB_EndWall", new Vector3(10.68f, 1.3f, 14.1f), new Vector3(0.1f, 2.6f, 2.0f), "concrete", EchoMaterial.Concrete, c);
 
-            // Anchors: the player passing door B's threshold appears at door A's threshold, same relative pose.
-            var exitGo = new GameObject("ExitAnchor_DoorB"); exitGo.transform.SetParent(c);
-            exitGo.transform.SetPositionAndRotation(new Vector3(7.6f, 0, 14.1f), Quaternion.Euler(0, 90, 0));
-            var entryGo = new GameObject("EntryAnchor_DoorA"); entryGo.transform.SetParent(c);
-            entryGo.transform.SetPositionAndRotation(new Vector3(0, 0, 0.6f), Quaternion.Euler(0, 0, 0));
+            // Anchors: same spot inside each vestibule (1.25 m in from the door behind you).
+            var exitGo = new GameObject("ExitAnchor_VestibuleB"); exitGo.transform.SetParent(c);
+            exitGo.transform.SetPositionAndRotation(new Vector3(9.3f, 0, 14.1f), Quaternion.Euler(0, 90, 0));
+            var entryGo = new GameObject("EntryAnchor_VestibuleA"); entryGo.transform.SetParent(c);
+            entryGo.transform.SetPositionAndRotation(new Vector3(0, 0, -0.25f), Quaternion.Euler(0, 0, 0));
             exitAnchor = exitGo.transform; entryAnchor = entryGo.transform;
 
-            var trig = new GameObject("LoopTrigger_BeforeDoorB"); trig.transform.SetParent(c);
-            trig.transform.position = new Vector3(7.6f, 1.2f, 14.1f);
-            loopTrigger = trig.AddComponent<BoxCollider>(); loopTrigger.isTrigger = true; loopTrigger.size = new Vector3(0.4f, 2.4f, w);
+            var trig = new GameObject("LoopTrigger_VestibuleB"); trig.transform.SetParent(c);
+            trig.transform.position = new Vector3(9.7f, 1.2f, 14.1f);
+            loopTrigger = trig.AddComponent<BoxCollider>(); loopTrigger.isTrigger = true; loopTrigger.size = new Vector3(0.3f, 2.4f, w);
 
             var back = new GameObject("TurnBackTrigger_DoorA"); back.transform.SetParent(c);
-            back.transform.position = new Vector3(0, 1.2f, 0.9f);
+            back.transform.position = new Vector3(0, 1.2f, 1.7f);
             var bb = back.AddComponent<BoxCollider>(); bb.isTrigger = true; bb.size = new Vector3(w, 2.4f, 0.3f);
         }
 
@@ -137,6 +153,7 @@ namespace EchoStation.EditorTools
             Box("GiantPump", new Vector3(16.5f, 1.0f, 16.5f), new Vector3(2.5f, 3, 2.5f), "rust", EchoMaterial.Metal, p);
             var killer = Box("KILLER_Placeholder", new Vector3(17, 0.9f, 12), new Vector3(0.5f, 1.8f, 0.35f), "dark", EchoMaterial.Body, p);
             killer.gameObject.SetActive(false);   // task 3 (KillerController) brings him to life
+            p.position += Vector3.right * 2f;     // room for vestibule B
         }
 
         static void BuildPipeAndOutside()
@@ -164,6 +181,7 @@ namespace EchoStation.EditorTools
             var broken = Box("BrokenCar_Hazards", new Vector3(76, -0.4f, 20), new Vector3(1.8f, 1.3f, 4.2f), "dark", EchoMaterial.Metal, o);
             foreach (float dx in new[] { -0.75f, 0.75f }) HazardLight(broken, new Vector3(dx, 0, -2.15f));
             Box("PoliceCar_Brazili", new Vector3(80, -0.4f, 16), new Vector3(1.8f, 1.4f, 4.4f), "dark", EchoMaterial.Metal, o);
+            o.position += Vector3.right * 2f;
         }
 
         static void HazardLight(Transform parent, Vector3 local)
@@ -228,25 +246,126 @@ namespace EchoStation.EditorTools
             {
                 string path = $"{MatDir}/GB_{key}.mat";
                 m = AssetDatabase.LoadAssetAtPath<Material>(path);
-                if (m == null)
+                if (m == null) { m = new Material(Shader.Find("HDRP/Lit")); AssetDatabase.CreateAsset(m, path); }
+                // An abandoned pumping station at night: wet, stained, almost colourless. Nothing bright except paper and the tea.
+                (Color c, string tex, float smooth) = key switch
                 {
-                    m = new Material(Shader.Find("HDRP/Lit"));
-                    Color c = key switch
-                    {
-                        "concrete" => new Color(0.32f, 0.33f, 0.31f), "paint" => new Color(0.55f, 0.50f, 0.40f),   // faded government beige
-                        "rust" => new Color(0.30f, 0.20f, 0.14f), "dark" => new Color(0.08f, 0.08f, 0.08f),
-                        "wood" => new Color(0.25f, 0.18f, 0.12f), "tea" => new Color(0.60f, 0.18f, 0.07f),        // the only saturated red
-                        "paper" => new Color(0.75f, 0.72f, 0.62f), "water" => new Color(0.05f, 0.09f, 0.08f),
-                        "mud" => new Color(0.22f, 0.19f, 0.15f), "reed" => new Color(0.36f, 0.34f, 0.24f),
-                        _ => Color.gray
-                    };
-                    m.SetColor("_BaseColor", c);
-                    m.SetFloat("_Smoothness", key == "water" ? 0.95f : key == "rust" ? 0.25f : 0.15f);
-                    AssetDatabase.CreateAsset(m, path);
+                    "concrete" => (new Color(0.13f, 0.135f, 0.13f), "WetConcrete", 0.62f),
+                    "paint" => (new Color(0.20f, 0.185f, 0.15f), "GovBeigePeeling", 0.2f),      // government beige, 20 years of damp
+                    "dado" => (new Color(0.055f, 0.06f, 0.055f), "WetConcrete", 0.35f),         // dark oil-paint band on the lower wall
+                    "rust" => (new Color(0.20f, 0.12f, 0.08f), "Rust", 0.25f),
+                    "steel" => (new Color(0.10f, 0.105f, 0.11f), "Rust", 0.45f),
+                    "dark" => (new Color(0.03f, 0.03f, 0.03f), (string)null, 0.35f),
+                    "wood" => (new Color(0.14f, 0.10f, 0.07f), "OldWood", 0.2f),
+                    "tea" => (new Color(0.60f, 0.18f, 0.07f), (string)null, 0.9f),                      // the only saturated red
+                    "paper" => (new Color(0.50f, 0.47f, 0.38f), (string)null, 0.1f),
+                    "water" => (new Color(0.02f, 0.035f, 0.03f), "DarkWater", 0.96f),
+                    "mud" => (new Color(0.16f, 0.14f, 0.11f), "CrackedMud", 0.1f),
+                    "reed" => (new Color(0.24f, 0.23f, 0.16f), "Reed", 0.15f),
+                    _ => (Color.gray, (string)null, 0.2f)
+                };
+                var t = tex == null ? null : AssetDatabase.LoadAssetAtPath<Texture2D>($"{Root}/Art/Generated/T_{tex}.png");
+                if (t != null)
+                {
+                    m.SetTexture("_BaseColorMap", t);
+                    c = c / 0.45f; c.a = 1f;   // textures are mid-grey already: the tint only pulls them down to night levels
                 }
+                m.SetColor("_BaseColor", c);
+                m.SetFloat("_Smoothness", smooth);
+                EditorUtility.SetDirty(m);
                 mats[key] = m;
             }
             go.GetComponent<Renderer>().sharedMaterial = m;
+        }
+
+        // ---------- doors ----------
+
+        /// <summary>Wall pieces around a 1.1 x 2.1 m doorway in a 1.8 m corridor. alongX = the corridor runs along X.</summary>
+        static void DoorFrame(string n, Vector3 floorCenter, bool alongX, Transform parent)
+        {
+            const float h = 2.6f;
+            Vector3 side = alongX ? Vector3.forward : Vector3.right;
+            Vector3 S(float across, float up) => alongX ? new Vector3(0.1f, up, across) : new Vector3(across, up, 0.1f);
+            Box(n + "_L", floorCenter - side * 0.75f + Vector3.up * h / 2, S(0.4f, h), "paint", EchoMaterial.Concrete, parent);
+            Box(n + "_R", floorCenter + side * 0.75f + Vector3.up * h / 2, S(0.4f, h), "paint", EchoMaterial.Concrete, parent);
+            Box(n + "_Lintel", floorCenter + Vector3.up * 2.35f, S(1.1f, 0.5f), "paint", EchoMaterial.Concrete, parent);
+        }
+
+        /// <summary>A heavy steel door on a hinge. Opens as Ali comes from the front, slams once he is through.</summary>
+        static AutoDoor Door(string n, Vector3 hinge, Vector3 leafOffset, Vector3 leafSize, Vector3 passDir, float openAngle, Transform parent)
+        {
+            var pivot = new GameObject(n).transform; pivot.SetParent(parent); pivot.position = hinge;
+            Box(n + "_Leaf", hinge + leafOffset, leafSize, "rust", EchoMaterial.Metal, pivot);
+            var a = pivot.gameObject.AddComponent<AudioSource>();
+            a.playOnAwake = false; a.spatialBlend = 1f; a.minDistance = 1f; a.maxDistance = 14f; a.rolloffMode = AudioRolloffMode.Linear;
+            var d = pivot.gameObject.AddComponent<AutoDoor>();
+            Set(d, "passDirection", passDir); Set(d, "openAngle", openAngle); Set(d, "audioSource", a);
+            Set(d, "openClip", Clip("door_creak")); Set(d, "slamClip", Clip("door_slam"));
+            return d;
+        }
+
+        // ---------- station dressing ----------
+
+        static Transform Cyl(string n, Vector3 a, Vector3 b, float radius, string mat, Transform parent)
+        {
+            var go = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            go.name = n; go.transform.SetParent(parent);
+            go.transform.position = (a + b) / 2f; go.transform.up = (b - a).normalized;
+            go.transform.localScale = new Vector3(radius * 2f, (b - a).magnitude / 2f, radius * 2f);
+            Paint(go, mat);
+            go.AddComponent<EchoSurface>(); SetSurface(go, EchoMaterial.Metal);
+            return go.transform;
+        }
+
+        /// <summary>What makes it a pumping station and not a hallway: pipes, valves, gauges, cabinets, wet floor, grime.</summary>
+        static void DressStation()
+        {
+            var d = new GameObject("DRESSING_Station").transform; d.SetParent(world);
+            // Corridor, first leg (x -0.9..0.9, z 1..15): pipe runs under the ceiling
+            Cyl("Pipe_Main", new Vector3(0.70f, 2.22f, 1.15f), new Vector3(0.70f, 2.22f, 13.1f), 0.10f, "rust", d);
+            Cyl("Pipe_Thin", new Vector3(0.46f, 2.34f, 1.15f), new Vector3(0.46f, 2.34f, 14.9f), 0.045f, "steel", d);
+            Cyl("Pipe_Left", new Vector3(-0.76f, 2.18f, 1.15f), new Vector3(-0.76f, 2.18f, 14.9f), 0.07f, "rust", d);
+            for (int i = 0; i < 5; i++)   // pipe clamps
+                Box("Clamp" + i, new Vector3(0.70f, 2.33f, 2.5f + i * 2.6f), new Vector3(0.28f, 0.25f, 0.06f), "steel", EchoMaterial.Metal, d);
+            // Risers with valve wheels on the right wall
+            foreach (float z in new[] { 3.6f, 8.8f })
+            {
+                Cyl("Riser", new Vector3(0.78f, 0, z), new Vector3(0.78f, 2.22f, z), 0.07f, "rust", d);
+                Cyl("ValveWheel", new Vector3(0.66f, 1.15f, z), new Vector3(0.69f, 1.15f, z), 0.17f, "dark", d);
+                Cyl("ValveStem", new Vector3(0.62f, 1.15f, z), new Vector3(0.78f, 1.15f, z), 0.02f, "steel", d);
+            }
+            // Gauge board
+            Box("GaugeBoard", new Vector3(0.86f, 1.5f, 11f), new Vector3(0.05f, 0.5f, 0.9f), "steel", EchoMaterial.Metal, d);
+            for (int i = -1; i <= 1; i++)
+                Cyl("Gauge", new Vector3(0.83f, 1.52f, 11f + i * 0.28f), new Vector3(0.815f, 1.52f, 11f + i * 0.28f), 0.10f, "paper", d);
+            // Electrical cabinets: they also narrow the corridor
+            Box("Cabinet_A", new Vector3(-0.72f, 0.9f, 12.4f), new Vector3(0.32f, 1.8f, 0.7f), "steel", EchoMaterial.Metal, d);
+            Box("Cabinet_B", new Vector3(-0.74f, 0.75f, 2.2f), new Vector3(0.28f, 1.5f, 0.6f), "steel", EchoMaterial.Metal, d);
+            Cyl("Conduit", new Vector3(-0.72f, 1.8f, 12.4f), new Vector3(-0.72f, 2.5f, 12.4f), 0.03f, "dark", d);
+            // Dark oil-paint band on the lower walls
+            Box("Dado_L1", new Vector3(-0.893f, 0.6f, 3f), new Vector3(0.02f, 1.2f, 4f), "dado", EchoMaterial.Concrete, d);
+            Box("Dado_L2", new Vector3(-0.893f, 0.6f, 11.5f), new Vector3(0.02f, 1.2f, 7f), "dado", EchoMaterial.Concrete, d);
+            Box("Dado_R1", new Vector3(0.893f, 0.6f, 7.1f), new Vector3(0.02f, 1.2f, 12.2f), "dado", EchoMaterial.Concrete, d);
+            Box("Dado_Far2a", new Vector3(1.925f, 0.6f, 14.993f), new Vector3(2.05f, 1.2f, 0.02f), "dado", EchoMaterial.Concrete, d);
+            Box("Dado_Far2b", new Vector3(6.025f, 0.6f, 14.993f), new Vector3(3.95f, 1.2f, 0.02f), "dado", EchoMaterial.Concrete, d);
+            Box("Dado_Near2", new Vector3(4.45f, 0.6f, 13.207f), new Vector3(7.1f, 1.2f, 0.02f), "dado", EchoMaterial.Concrete, d);
+            // Floor: drain channel and standing water
+            Box("DrainGrate", new Vector3(0, 0.004f, 8f), new Vector3(0.24f, 0.012f, 13.6f), "steel", EchoMaterial.Metal, d);
+            foreach (var (x, z, sx, sz) in new[] { (0.35f, 6.4f, 0.9f, 1.5f), (-0.3f, 11.6f, 0.8f, 1.9f), (4.2f, 14.2f, 2.2f, 1.1f) })
+            {
+                var w = Box("Puddle", new Vector3(x, 0.003f, z), new Vector3(sx, 0.008f, sz), "water", EchoMaterial.Water, d);
+                Object.DestroyImmediate(w.GetComponent<Collider>());
+            }
+            // Second leg: pipes turn the corner with you
+            Cyl("Pipe_Main2", new Vector3(0.9f, 2.22f, 14.8f), new Vector3(8.0f, 2.22f, 14.8f), 0.10f, "rust", d);
+            Cyl("Pipe_Elbow", new Vector3(0.70f, 2.22f, 13.1f), new Vector3(0.9f, 2.22f, 14.8f), 0.10f, "rust", d);
+            Box("CableTray", new Vector3(4.4f, 2.38f, 13.45f), new Vector3(7f, 0.04f, 0.3f), "steel", EchoMaterial.Metal, d);
+            // Storeroom: barrels, shelves, sacks
+            foreach (var (x, z) in new[] { (-1.5f, -6.0f), (-0.9f, -6.1f), (-1.55f, -5.3f) })
+                Cyl("Barrel", new Vector3(x, 0, z), new Vector3(x, 0.9f, z), 0.29f, "rust", d);
+            Box("Shelves", new Vector3(1.78f, 1.0f, -4.6f), new Vector3(0.35f, 2.0f, 2.2f), "steel", EchoMaterial.Metal, d);
+            Box("Sacks", new Vector3(1.3f, 0.25f, -2.2f), new Vector3(1.0f, 0.5f, 0.6f), "mud", EchoMaterial.Concrete, d);
+            Cyl("Store_Pipe", new Vector3(-1.9f, 2.3f, -6.4f), new Vector3(-1.9f, 2.3f, -1.6f), 0.08f, "rust", d);
         }
 
         // ---------- systems ----------
@@ -254,7 +373,7 @@ namespace EchoStation.EditorTools
         static LivingTape SetupTape(GameObject recorder)
         {
             var src = recorder.AddComponent<AudioSource>();
-            src.spatialBlend = 1; src.volume = 0.3f; src.maxDistance = 12; src.rolloffMode = AudioRolloffMode.Linear;
+            src.spatialBlend = 1; src.volume = 0.08f; src.maxDistance = 12; src.rolloffMode = AudioRolloffMode.Linear;
             var tape = recorder.AddComponent<LivingTape>();
             var so = new SerializedObject(tape);
             var entries = so.FindProperty("entries");
@@ -273,7 +392,7 @@ namespace EchoStation.EditorTools
         static void BuildGenerator()
         {
             var g = new GameObject("Generator_Hum (safety)"); g.transform.SetParent(world);
-            g.transform.position = new Vector3(-1.5f, 1, -6);
+            g.transform.position = new Vector3(-1.5f, 1, -7.5f);
             var s = g.AddComponent<AudioSource>();
             s.clip = AssetDatabase.LoadAssetAtPath<AudioClip>(GenAudio + "generator_hum_loop.ogg");
             s.loop = true; s.playOnAwake = true; s.spatialBlend = 1f; s.volume = 0.1f; s.minDistance = 2f; s.maxDistance = 25f; s.rolloffMode = AudioRolloffMode.Linear;
@@ -290,16 +409,16 @@ namespace EchoStation.EditorTools
             void Point(string n, Vector3 p, Color c, float range, float intensity)
             {
                 var go = new GameObject(n); go.transform.SetParent(l); go.transform.position = p;
-                var li = go.AddComponent<Light>(); li.type = LightType.Point; li.color = c; li.range = range; li.intensity = intensity * 8f;   // HDRP physical units
+                var li = go.AddComponent<Light>(); li.type = LightType.Point; li.color = c; li.range = range; li.intensity = intensity * 6f;   // HDRP physical units
                 li.shadows = LightShadows.Soft;
                 if (!go.GetComponent<HDAdditionalLightData>()) go.AddComponent<HDAdditionalLightData>();
             }
             Color neon = new Color(1f, 0.95f, 0.8f);      // yellowish white, never green
-            Point("Bulb_Storeroom", new Vector3(0.3f, 2.3f, -2.5f), new Color(1f, 0.85f, 0.6f), 5, 120);
+            Point("Bulb_Storeroom", new Vector3(0.3f, 2.3f, -4f), new Color(1f, 0.85f, 0.6f), 5, 120);
             Point("Neon_Corridor_1", new Vector3(0, 2.35f, 4), neon, 6, 90);
             Point("Neon_Corridor_2", new Vector3(0, 2.35f, 11), neon, 6, 60);
             Point("Neon_Segment2", new Vector3(4.5f, 2.35f, 14.1f), neon, 5, 40);
-            Point("Lantern_Glow_PumpHall", new Vector3(17, 1.3f, 12), new Color(1f, 0.7f, 0.35f), 6, 80);
+            Point("Lantern_Glow_PumpHall", new Vector3(19, 1.3f, 12), new Color(1f, 0.7f, 0.35f), 6, 80);
         }
 
         static void BuildVolume()
@@ -382,7 +501,7 @@ namespace EchoStation.EditorTools
             }
             var none = new GameObject[0];
             A(1, "Calendar gone", none, new[] { F("Calendar_Jan1994") });
-            A(2, "Radio static behind the left wall", new[] { SoundObj("A02_RadioStatic", new Vector3(-2.5f, 1.2f, 10), "radio_static", 0.35f, false) }, none);
+            A(2, "Radio static behind the left wall", new[] { SoundObj("A02_RadioStatic", new Vector3(-2.5f, 1.2f, 10), "radio_static", 0.2f, false) }, none);
             // Someone beats the workshop door from inside. It stops the moment you get close.
             var wDoor = Box("WorkshopDoor", new Vector3(-0.9f, 1.05f, 6.5f), new Vector3(0.06f, 2.1f, 1.1f), "rust", EchoMaterial.Metal, world);
             var bang = SoundObj("A03_DoorBang", new Vector3(-0.9f, 1.2f, 6.5f), "door_bang_loop", 0.7f, true);
@@ -487,6 +606,7 @@ namespace EchoStation.EditorTools
                 case int i when p.propertyType == SerializedPropertyType.LayerMask: p.intValue = i; break;
                 case int i: p.intValue = i; break;
                 case float f: p.floatValue = f; break;
+                case Vector3 v: p.vector3Value = v; break;
                 case bool b: p.boolValue = b; break;
             }
             so.ApplyModifiedPropertiesWithoutUndo();
