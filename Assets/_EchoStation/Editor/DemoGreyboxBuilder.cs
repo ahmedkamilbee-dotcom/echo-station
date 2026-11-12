@@ -45,9 +45,12 @@ namespace EchoStation.EditorTools
             BuildVolume();
             var storeroom = Room("01_Storeroom", new Vector3(0, 0, -2.5f), new Vector3(4, 2.6f, 5), "concrete", EchoMaterial.Concrete, openZPlus: true);
             Box("VestibuleA_Floor", new Vector3(0, -0.05f, 0.5f), new Vector3(1.8f, 0.1f, 1), "concrete", EchoMaterial.Concrete, storeroom.parent);
+            Box("VestibuleA_Ceil", new Vector3(0, 2.5f, 0.5f), new Vector3(2.0f, 0.1f, 1.1f), "concrete", EchoMaterial.Concrete, storeroom.parent);
+            Box("VestibuleA_WallL", new Vector3(-0.95f, 1.3f, 0.5f), new Vector3(0.1f, 2.6f, 1.1f), "paint", EchoMaterial.Concrete, storeroom.parent);
+            Box("VestibuleA_WallR", new Vector3(0.95f, 1.3f, 0.5f), new Vector3(0.1f, 2.6f, 1.1f), "paint", EchoMaterial.Concrete, storeroom.parent);
             BuildCorridor(out Transform exitAnchor, out Transform entryAnchor, out BoxCollider loopTrigger);
             Room("04_Workshop", new Vector3(-2.9f, 0, 6.5f), new Vector3(4, 2.6f, 3), "concrete", EchoMaterial.Concrete, openXPlus: true);
-            Room("05_ControlRoom", new Vector3(3.5f, 0, 16.4f), new Vector3(3, 2.6f, 3), "concrete", EchoMaterial.Concrete, openZMinus: true);
+            Room("05_ControlRoom", new Vector3(3.5f, 0, 16.6f), new Vector3(3, 2.6f, 3), "concrete", EchoMaterial.Concrete, openZMinus: true);
             BuildPumpHall();
             BuildPipeAndOutside();
 
@@ -77,6 +80,8 @@ namespace EchoStation.EditorTools
 
             BuildGenerator();
             BuildLights();
+            WireAnomalies(director);
+            BuildAmbience();
             BuildAli(new Vector3(0.6f, 0.05f, -3.2f));
 
             EditorSceneManager.SaveScene(scene, ScenePath);
@@ -99,8 +104,8 @@ namespace EchoStation.EditorTools
             // segment 2 (after the blind corner): x 0.9..8 along +X at z 14.1
             Box("Floor2", new Vector3(4.45f, -0.05f, 14.1f), new Vector3(7.1f, 0.1f, w), "concrete", EchoMaterial.Concrete, c);
             Box("Ceil2", new Vector3(4.45f, h, 14.1f), new Vector3(7.1f, 0.1f, w), "concrete", EchoMaterial.Concrete, c);
-            Box("WallFar2a", new Vector3(2.35f, h / 2, 15.05f), new Vector3(2.9f, h, 0.1f), "paint", EchoMaterial.Concrete, c); // gap = control room door
-            Box("WallFar2b", new Vector3(6.4f, h / 2, 15.05f), new Vector3(3.2f, h, 0.1f), "paint", EchoMaterial.Concrete, c);
+            Box("WallFar2a", new Vector3(1.925f, h / 2, 15.05f), new Vector3(2.05f, h, 0.1f), "paint", EchoMaterial.Concrete, c); // gap = control room door
+            Box("WallFar2b", new Vector3(6.075f, h / 2, 15.05f), new Vector3(4.05f, h, 0.1f), "paint", EchoMaterial.Concrete, c);
             Box("WallNear2", new Vector3(4.95f, h / 2, 13.15f), new Vector3(8.1f, h, 0.1f), "paint", EchoMaterial.Concrete, c);
             Box("DoorB", new Vector3(8.05f, 1.05f, 14.1f), new Vector3(0.1f, 2.1f, 1.1f), "rust", EchoMaterial.Metal, c);
 
@@ -305,11 +310,89 @@ namespace EchoStation.EditorTools
             fog.enabled.Override(true);
             fog.meanFreePath.Override(9f);          // thick, cheap to tune
             fog.enableVolumetricFog.Override(true);
+            // Black night sky: no daylight/ambient leaking into the station.
+            var ve = profile.Add<VisualEnvironment>(true);
+            ve.skyType.Override(3);                 // 3 = Gradient sky
+            var sky = profile.Add<GradientSky>(true);
+            sky.top.Override(Color.black); sky.middle.Override(new Color(0.004f, 0.005f, 0.006f)); sky.bottom.Override(Color.black);
             var exp = profile.Add<Exposure>(true);
             exp.mode.Override(ExposureMode.Fixed);
-            exp.fixedExposure.Override(1.5f);       // dark, but readable; tune per room
+            exp.fixedExposure.Override(3f);         // higher = darker. Neon pools readable, corners black.
             AssetDatabase.CreateAsset(profile, Root + "/Scenes/Demo_Greybox_Volume.asset");
             v.sharedProfile = profile;
+        }
+
+        static AudioClip Clip(string n) => AssetDatabase.LoadAssetAtPath<AudioClip>(GenAudio + n + ".ogg");
+
+        static GameObject SoundObj(string n, Vector3 p, string clip, float vol, bool loop)
+        {
+            var go = new GameObject(n); go.transform.SetParent(world); go.transform.position = p;
+            var a = go.AddComponent<AudioSource>();
+            a.clip = Clip(clip); a.playOnAwake = true; a.loop = loop; a.volume = vol;
+            a.spatialBlend = 1f; a.minDistance = 1.5f; a.maxDistance = 16f; a.rolloffMode = AudioRolloffMode.Linear;
+            go.SetActive(false);
+            return go;
+        }
+
+        static GameObject Figure(string n, Vector3 feet, float height)
+        {
+            var f = Box(n, feet + Vector3.up * height / 2, new Vector3(0.45f, height, 0.3f), "dark", EchoMaterial.Body, world).gameObject;
+            f.SetActive(false);
+            return f;
+        }
+
+        /// <summary>Each loop changes one thing. Silent first loops, then it gets worse (P.T.-style escalation).</summary>
+        static void WireAnomalies(AnomalyDirector director)
+        {
+            GameObject F(string n) => GameObject.Find(n);
+            var so = new SerializedObject(director);
+            var seq = so.FindProperty("sequence");
+            void A(int i, string note, GameObject[] on, GameObject[] off, bool halluc = false)
+            {
+                var e = seq.GetArrayElementAtIndex(i);
+                e.FindPropertyRelative("note").stringValue = note;
+                var pOn = e.FindPropertyRelative("enableOnStep"); pOn.arraySize = on.Length;
+                for (int k = 0; k < on.Length; k++) pOn.GetArrayElementAtIndex(k).objectReferenceValue = on[k];
+                var pOff = e.FindPropertyRelative("disableOnStep"); pOff.arraySize = off.Length;
+                for (int k = 0; k < off.Length; k++) pOff.GetArrayElementAtIndex(k).objectReferenceValue = off[k];
+                e.FindPropertyRelative("isHallucination").boolValue = halluc;
+            }
+            var none = new GameObject[0];
+            A(1, "Calendar gone", none, new[] { F("Calendar_Jan1994") });
+            A(2, "Radio static behind the left wall", new[] { SoundObj("A02_RadioStatic", new Vector3(-2.5f, 1.2f, 10), "radio_static", 0.35f, false) }, none);
+            A(3, "Far neon dead", none, new[] { F("Neon_Corridor_2"), F("Neon_Segment2") });
+            A(4, "Three knocks on the pipe above you", new[] { SoundObj("A04_Knocks", new Vector3(0, 2.8f, 8), "knock_pipe_x3", 0.6f, false) }, new[] { F("TeaGlass_RED") });
+            A(5, "Someone stands at the corner. No echo.",
+              new[] { Figure("A05_FigureAtCorner", new Vector3(0, 0, 14.3f), 1.95f), SoundObj("A05_Swell", new Vector3(0, 1.5f, 14), "scare_swell_stinger", 0.4f, false) }, none, true);
+            A(6, "Lights out, only the bulb behind you. Metal groans.",
+              new[] { SoundObj("A06_Groan", new Vector3(3, 3, 12), "metal_groan", 0.5f, false) }, new[] { F("Neon_Corridor_1"), F("Neon_Corridor_2"), F("Neon_Segment2") });
+            A(7, "Whisper texture, close", new[] { SoundObj("A06b_Whisper", new Vector3(-1.2f, 1.6f, 6), "whisper_texture_loop", 0.25f, true) }, none);
+            A(8, "The figure is halfway down the corridor now",
+              new[] { Figure("A07_FigureMid", new Vector3(0.3f, 0, 9.5f), 1.95f), SoundObj("A07_Heart", new Vector3(0, 1.5f, 9), "heartbeat", 0.5f, true) }, new[] { F("Neon_Corridor_2") }, true);
+            A(9, "Clock gone, dripping", new[] { SoundObj("A08_Drip", new Vector3(0.5f, 2.4f, 5), "drip", 0.5f, true) }, new[] { F("WallClock_0547") });
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        static void BuildAmbience()
+        {
+            var dread = GameObject.Find("Dread_Drone (under everything)");
+            var amb = dread.AddComponent<AmbienceDirector>();
+            var e = new GameObject("Elsewhere_Source"); e.transform.SetParent(world);
+            var es = e.AddComponent<AudioSource>(); es.playOnAwake = false; es.spatialBlend = 1f; es.maxDistance = 20f; es.rolloffMode = AudioRolloffMode.Linear;
+            var pts = new List<Transform>();
+            foreach (var p in new[] { new Vector3(-3, 1, 12), new Vector3(3, 3.2f, 6), new Vector3(5, 1, 18), new Vector3(-3, 1, -4) })
+            { var t = new GameObject("ElsewherePoint").transform; t.SetParent(e.transform); t.position = p; pts.Add(t); }
+            var so = new SerializedObject(amb);
+            so.FindProperty("dread").objectReferenceValue = dread.GetComponent<AudioSource>();
+            so.FindProperty("elsewhere").objectReferenceValue = es;
+            var clips = so.FindProperty("elsewhereClips");
+            string[] names = { "metal_groan", "distant_splash_thud", "knock_pipe_x3", "drip" };
+            clips.arraySize = names.Length;
+            for (int i = 0; i < names.Length; i++) clips.GetArrayElementAtIndex(i).objectReferenceValue = Clip(names[i]);
+            var ptsP = so.FindProperty("elsewherePoints"); ptsP.arraySize = pts.Count;
+            for (int i = 0; i < pts.Count; i++) ptsP.GetArrayElementAtIndex(i).objectReferenceValue = pts[i];
+            so.FindProperty("elsewhereInterval").vector2Value = new Vector2(18f, 40f);
+            so.ApplyModifiedPropertiesWithoutUndo();
         }
 
         static void BuildAli(Vector3 pos)

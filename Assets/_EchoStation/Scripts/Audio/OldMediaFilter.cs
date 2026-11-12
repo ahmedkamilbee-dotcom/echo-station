@@ -19,7 +19,7 @@ namespace EchoStation.Audio
 
         [SerializeField] Preset preset = Preset.Radio;
         [Range(0f, 1f)] public float corruption = 0f;
-        [SerializeField, Range(0f, 0.2f)] float noiseLevel = 0.04f;
+        [SerializeField, Range(0f, 0.2f)] float noiseLevel = 0.012f;
 
         AudioSource source;
         float sampleRate;
@@ -29,6 +29,8 @@ namespace EchoStation.Audio
         float squelchTimer;
         bool squelched;
         float basePitch = 1f;
+        volatile bool active;   // audio thread can't call source.isPlaying
+        float gain = 1f;
 
         void Awake()
         {
@@ -52,6 +54,7 @@ namespace EchoStation.Audio
 
         void Update()
         {
+            if (source != null) { active = source.isPlaying; gain = source.volume; }
             if (preset == Preset.Cassette && source != null)
             {
                 // wow (slow) + flutter (fast), stronger when corrupted
@@ -80,7 +83,7 @@ namespace EchoStation.Audio
         // Runs on the audio thread.
         void OnAudioFilterRead(float[] data, int channels)
         {
-            if (sampleRate <= 0f) return;
+            if (sampleRate <= 0f || !active) return;   // no hiss from a silent source (was a constant loud white noise)
             float hpA = Mathf.Exp(-2f * Mathf.PI * lowCut / sampleRate);
             float lpA = 1f - Mathf.Exp(-2f * Mathf.PI * highCut / sampleRate);
             float d = drive * (1f + corruption * 2f);
@@ -105,7 +108,7 @@ namespace EchoStation.Audio
                 y = (float)System.Math.Tanh(y * d) / (float)System.Math.Tanh(d);
                 if (corruption > 0.5f) y = Mathf.Round(y * 24f) / 24f;
 
-                y += Noise() * nl;
+                y += Noise() * nl * gain;
                 if (mute) y *= 0.05f;
 
                 for (int c = 0; c < channels; c++) data[i + c] = y;
