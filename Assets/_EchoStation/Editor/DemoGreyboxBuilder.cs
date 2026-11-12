@@ -248,7 +248,7 @@ namespace EchoStation.EditorTools
         static LivingTape SetupTape(GameObject recorder)
         {
             var src = recorder.AddComponent<AudioSource>();
-            src.spatialBlend = 1; src.maxDistance = 12; src.rolloffMode = AudioRolloffMode.Linear;
+            src.spatialBlend = 1; src.volume = 0.3f; src.maxDistance = 12; src.rolloffMode = AudioRolloffMode.Linear;
             var tape = recorder.AddComponent<LivingTape>();
             var so = new SerializedObject(tape);
             var entries = so.FindProperty("entries");
@@ -270,12 +270,12 @@ namespace EchoStation.EditorTools
             g.transform.position = new Vector3(-1.5f, 1, -6);
             var s = g.AddComponent<AudioSource>();
             s.clip = AssetDatabase.LoadAssetAtPath<AudioClip>(GenAudio + "generator_hum_loop.ogg");
-            s.loop = true; s.playOnAwake = true; s.spatialBlend = 0.7f; s.volume = 0.35f; s.maxDistance = 40;
+            s.loop = true; s.playOnAwake = true; s.spatialBlend = 1f; s.volume = 0.1f; s.minDistance = 2f; s.maxDistance = 25f; s.rolloffMode = AudioRolloffMode.Linear;
 
             var d = new GameObject("Dread_Drone (under everything)"); d.transform.SetParent(world);
             var ds = d.AddComponent<AudioSource>();
             ds.clip = AssetDatabase.LoadAssetAtPath<AudioClip>(GenAudio + "dread_drone_loop.ogg");
-            ds.loop = true; ds.playOnAwake = true; ds.spatialBlend = 0; ds.volume = 0.08f;
+            ds.loop = true; ds.playOnAwake = true; ds.spatialBlend = 0; ds.volume = 0.02f;
         }
 
         static void BuildLights()
