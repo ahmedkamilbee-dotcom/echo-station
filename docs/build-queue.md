@@ -16,8 +16,8 @@
 - [x] 7. → `Haunt/TantalStalker.cs`. **الطنطل** (`TantalStalker`): يتحرك بس بإطارات الرمش أو لما ما ينشاف، وأقرب كل مرة، وأصوات المكان تختفي وحدة وحدة.
 - [x] 8. → `World/DemoClock.cs`. **مدير وقت الديمو** (`DemoClock`): ميزانية الـ30 دقيقة، والأحداث المضمونة بالوقت، وسقف 60 ثانية للدورة، وشيل الدورات الفارغة إذا تأخر.
 - [x] 9. **مشهد الصحوة** → `World/WakeSequence.cs` (يحتاج Canvas بصورة سودة كاملة للجفون؛ وأداة البناء تربطه بالمهمة الجاية). **مشهد الصحوة** (`WakeSequence`): أول 60 ثانية بالضبط حسب `demo-design.md` (الصوت قبل الصورة، فتح الجفون، الدگات بالثانية 45، أول نبضة بالثانية 55).
-- [ ] 10. **الألغاز الخمسة** (`ClockPuzzle`, `KnockRhythmPuzzle`, `CassetteFlipPuzzle`, `MuffledSearchPuzzle`, `RadioChannelPuzzle`) ويا سلّم المساعدة بلا واجهة.
-- [ ] 11. **الأسرار الأربعة** (`SecretTracker`) والكاسيت الخامس وتأثيره على جملة خلف.
+- [x] 10. → `Puzzles/` (`PuzzleBase` ويا سلّم المساعدة، و`ClockPuzzle`، و`KnockRhythmPuzzle`، و`CassetteFlipPuzzle`، و`MuffledSearchPuzzle`، و`RadioChannelPuzzle`). **الألغاز الخمسة** (`ClockPuzzle`, `KnockRhythmPuzzle`, `CassetteFlipPuzzle`, `MuffledSearchPuzzle`, `RadioChannelPuzzle`) ويا سلّم المساعدة بلا واجهة.
+- [x] 11. → `Puzzles/SecretTracker.cs`. **الأسرار الأربعة** (`SecretTracker`) والكاسيت الخامس وتأثيره على جملة خلف.
 - [x] 12. → `World/CarEnding.cs` (+ `World/Subtitles.cs` نسخة مبدئية). **النهاية** (`CarEnding`): السيارة، والقفل، والطنطل، والأذان، وثلاث دگات، وخلف (نص وجه)، والاستكان، والسواد، والاسم، وبطاقة قائمة الأمنيات.
 - [ ] 13. **الترجمة** (`Subtitles`, `Localization`): عربي وإنگليزي، صغيرة وبلا اسم المتكلم، ودعم RTL (RTLTMPro، رخصته MIT، يتأكد منها).
 - [x] 14. → `UI/GameMenus.cs` (الشاشات تنبني بالمشهد وتنربط). **القوائم** (`WarningScreen`, `PauseMenu`, `OptionsMenu`): تحذير حساسية الضوء، وتقليل الوميض، وحساسية الماوس، والترجمة، وحبس النفس بكبسة.

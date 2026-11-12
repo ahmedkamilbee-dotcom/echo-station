@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using EchoStation.Player;
 
 namespace EchoStation.Audio
 {
@@ -18,7 +19,7 @@ namespace EchoStation.Audio
     /// so pausing and distortions never fight over the same AudioSource.
     /// </summary>
     [RequireComponent(typeof(AudioSource))]
-    public class LivingTape : MonoBehaviour
+    public class LivingTape : MonoBehaviour, IInteractable
     {
         public enum Distortion { None, Slow, Reverse, Stutter, Silence, Answer }
 

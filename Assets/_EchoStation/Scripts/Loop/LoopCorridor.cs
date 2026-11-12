@@ -52,7 +52,7 @@ namespace EchoStation.Loop
             float yawDelta = entryAnchor.eulerAngles.y - exitAnchor.eulerAngles.y;
             ali.Teleport(target, yawDelta);
 
-            bool tapeRunning = tape == null || !tape.HasEntryFor(Step) || tape.IsPlaying;
+            bool tapeRunning = (tape == null || !tape.HasEntryFor(Step) || tape.IsPlaying) && !EchoStation.Puzzles.PuzzleBase.AnyBlocking;
             bool correct = director == null || director.ForwardPassIsCorrect();
             if (tapeRunning && correct) Advance();
         }
