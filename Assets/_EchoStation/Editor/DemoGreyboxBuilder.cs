@@ -7,6 +7,7 @@ using UnityEngine.Rendering;
 using UnityEngine.Rendering.HighDefinition;
 using EchoStation.Audio;
 using EchoStation.Echo;
+using EchoStation.Haunt;
 using EchoStation.Loop;
 using EchoStation.Player;
 
@@ -341,6 +342,28 @@ namespace EchoStation.EditorTools
             return f;
         }
 
+        static GameObject Vanishing(GameObject figure, float distance)
+        {
+            Set(figure.AddComponent<VanishOnApproach>(), "distance", distance);
+            return figure;
+        }
+
+        static GameObject BuildBehindYou()
+        {
+            var go = new GameObject("A07_BehindYou"); go.transform.SetParent(world);
+            go.transform.position = new Vector3(0, 1.2f, 11.5f);
+            var bc = go.AddComponent<BoxCollider>(); bc.isTrigger = true; bc.size = new Vector3(1.8f, 2.4f, 0.4f);
+            var fig = Figure("BehindYou_Figure", new Vector3(0, 0, 11.5f), 2.05f);
+            fig.transform.SetParent(go.transform, true);
+            Object.DestroyImmediate(fig.GetComponent<Collider>());
+            var a = fig.AddComponent<AudioSource>();
+            a.clip = Clip("whisper_texture_loop"); a.loop = true; a.playOnAwake = true; a.volume = 0.5f;
+            a.spatialBlend = 1f; a.minDistance = 0.5f; a.maxDistance = 5f; a.rolloffMode = AudioRolloffMode.Linear;
+            Set(go.AddComponent<BehindYou>(), "figure", fig);
+            go.SetActive(false);
+            return go;
+        }
+
         /// <summary>Each loop changes one thing. Silent first loops, then it gets worse (P.T.-style escalation).</summary>
         static void WireAnomalies(AnomalyDirector director)
         {
@@ -360,16 +383,31 @@ namespace EchoStation.EditorTools
             var none = new GameObject[0];
             A(1, "Calendar gone", none, new[] { F("Calendar_Jan1994") });
             A(2, "Radio static behind the left wall", new[] { SoundObj("A02_RadioStatic", new Vector3(-2.5f, 1.2f, 10), "radio_static", 0.35f, false) }, none);
-            A(3, "Far neon dead", none, new[] { F("Neon_Corridor_2"), F("Neon_Segment2") });
+            // Someone beats the workshop door from inside. It stops the moment you get close.
+            var wDoor = Box("WorkshopDoor", new Vector3(-0.9f, 1.05f, 6.5f), new Vector3(0.06f, 2.1f, 1.1f), "rust", EchoMaterial.Metal, world);
+            var bang = SoundObj("A03_DoorBang", new Vector3(-0.9f, 1.2f, 6.5f), "door_bang_loop", 0.7f, true);
+            bang.GetComponent<AudioSource>().playOnAwake = false;
+            var bangA = bang.AddComponent<ApproachSound>();
+            Set(bangA, "startDistance", 7f); Set(bangA, "stopDistance", 1.7f); Set(bangA, "shake", wDoor);
+            A(3, "Far neon dead. The workshop door is beaten from inside", new[] { bang }, new[] { F("Neon_Corridor_2"), F("Neon_Segment2") });
             A(4, "Three knocks on the pipe above you", new[] { SoundObj("A04_Knocks", new Vector3(0, 2.8f, 8), "knock_pipe_x3", 0.6f, false) }, new[] { F("TeaGlass_RED") });
             A(5, "Someone stands at the corner. No echo.",
-              new[] { Figure("A05_FigureAtCorner", new Vector3(0, 0, 14.3f), 1.95f), SoundObj("A05_Swell", new Vector3(0, 1.5f, 14), "scare_swell_stinger", 0.4f, false) }, none, true);
+              new[] { Vanishing(Figure("A05_FigureAtCorner", new Vector3(0, 0, 14.3f), 1.95f), 6.5f), SoundObj("A05_Swell", new Vector3(0, 1.5f, 14), "scare_swell_stinger", 0.4f, false) }, none, true);
             A(6, "Lights out, only the bulb behind you. Metal groans.",
               new[] { SoundObj("A06_Groan", new Vector3(3, 3, 12), "metal_groan", 0.5f, false) }, new[] { F("Neon_Corridor_1"), F("Neon_Corridor_2"), F("Neon_Segment2") });
-            A(7, "Whisper texture, close", new[] { SoundObj("A06b_Whisper", new Vector3(-1.2f, 1.6f, 6), "whisper_texture_loop", 0.25f, true) }, none);
+            var swing = new GameObject("A06b_SwingingLamp"); swing.transform.SetParent(world);
+            Set(swing.AddComponent<SwingingLight>(), "target", F("Neon_Corridor_1").transform); swing.SetActive(false);
+            A(7, "The lamp swings by itself. Whisper, close", new[] { swing, SoundObj("A06b_Whisper", new Vector3(-1.2f, 1.6f, 6), "whisper_texture_loop", 0.25f, true) }, none);
             A(8, "The figure is halfway down the corridor now",
-              new[] { Figure("A07_FigureMid", new Vector3(0.3f, 0, 9.5f), 1.95f), SoundObj("A07_Heart", new Vector3(0, 1.5f, 9), "heartbeat", 0.5f, true) }, new[] { F("Neon_Corridor_2") }, true);
-            A(9, "Clock gone, dripping", new[] { SoundObj("A08_Drip", new Vector3(0.5f, 2.4f, 5), "drip", 0.5f, true) }, new[] { F("WallClock_0547") });
+              new[] { Vanishing(Figure("A07_FigureMid", new Vector3(0.3f, 0, 9.5f), 1.95f), 4f), BuildBehindYou(), SoundObj("A07_Heart", new Vector3(0, 1.5f, 9), "heartbeat", 0.5f, true) }, new[] { F("Neon_Corridor_2") }, true);
+            // A phone rings in the empty control room. It stops when you reach it.
+            Box("ControlDesk", new Vector3(3.5f, 0.4f, 17.6f), new Vector3(1.6f, 0.8f, 0.6f), "wood", EchoMaterial.Concrete, world);
+            Box("Phone_1994", new Vector3(3.5f, 0.86f, 17.6f), new Vector3(0.22f, 0.1f, 0.2f), "dark", EchoMaterial.Tape, world);
+            var ring = SoundObj("A08_PhoneRing", new Vector3(3.5f, 0.9f, 17.6f), "phone_ring_loop", 0.6f, true);
+            var ringSrc = ring.GetComponent<AudioSource>(); ringSrc.playOnAwake = false; ringSrc.maxDistance = 22f;
+            var ringA = ring.AddComponent<ApproachSound>();
+            Set(ringA, "startDistance", 16f); Set(ringA, "stopDistance", 1.5f);
+            A(9, "Clock gone, dripping. The phone rings in the control room", new[] { ring, SoundObj("A08_Drip", new Vector3(0.5f, 2.4f, 5), "drip", 0.5f, true) }, new[] { F("WallClock_0547") });
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 
