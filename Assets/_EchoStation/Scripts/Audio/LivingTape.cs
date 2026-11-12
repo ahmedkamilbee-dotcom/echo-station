@@ -54,7 +54,11 @@ namespace EchoStation.Audio
             source.loop = true;
             if (fxSource == null)
             {
-                fxSource = gameObject.AddComponent<AudioSource>();
+                // On a child, not on this GameObject: an OldMediaFilter here (OnAudioFilterRead)
+                // may only serve ONE AudioSource, so a second source on the same object is a Unity error.
+                var fxGo = new GameObject("TapeFX");
+                fxGo.transform.SetParent(transform, false);
+                fxSource = fxGo.AddComponent<AudioSource>();
                 fxSource.spatialBlend = 1f;
                 fxSource.playOnAwake = false;
             }
