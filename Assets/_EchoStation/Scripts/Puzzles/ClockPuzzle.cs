@@ -21,7 +21,7 @@ namespace EchoStation.Puzzles
         [SerializeField] AudioSource tick;
         [SerializeField] float degreesPerMouse = 0.4f;
         public bool Focused { get; set; }
-        float minutes = 46f;   // shows 5:46 -> jumps to 5:47 when the loop starts
+        float minutes = 47f;   // shows 5:47 -> the watch points back to 4:52
         bool opened;
 
         public override void Begin() { base.Begin(); minutes = 47f; if (tick) tick.Stop(); Draw(); }
@@ -33,11 +33,12 @@ namespace EchoStation.Puzzles
             if (!Active || !opened || !Focused) return;
             var kb = Keyboard.current; var m = Mouse.current;
             if (kb == null || m == null || !kb.eKey.isPressed) return;
-            minutes += m.delta.ReadValue().x * degreesPerMouse / 6f;   // 6 degrees per minute
+            minutes = Mathf.Clamp(minutes + m.delta.ReadValue().x * degreesPerMouse / 6f, -60f, 60f);
             Draw();
-            float target = 4f * 60f + AliWatch.MinutesPastFour;        // 4:5x
-            float shown = 5f * 60f + minutes;                           // "minutes" are counted from 5:00 (negative = before 5)
-            if (Mathf.Abs(Mathf.DeltaAngle(shown * 6f, target * 6f)) / 6f <= 2f) Solve();
+            // The dial is authored around 5:00, so 4:52 is -8 minutes from that origin.
+            // Compare the full clock position; checking only the minute hand also accepted 5:52.
+            float targetMinutes = AliWatch.MinutesPastFour - 60f;
+            if (Mathf.Abs(minutes - targetMinutes) <= 2f) Solve();
         }
 
         void Draw()

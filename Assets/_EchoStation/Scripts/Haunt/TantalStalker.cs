@@ -34,15 +34,18 @@ namespace EchoStation.Haunt
             distance = startDistance;
             baseHeight = transform.localScale.y;
             stolen = 0;
-            baseVolumes = new float[soundsToSteal.Length];
-            for (int i = 0; i < soundsToSteal.Length; i++) baseVolumes[i] = soundsToSteal[i] ? soundsToSteal[i].volume : 0f;
+            baseVolumes = new float[soundsToSteal == null ? 0 : soundsToSteal.Length];
+            if (soundsToSteal != null)
+                for (int i = 0; i < soundsToSteal.Length; i++) baseVolumes[i] = soundsToSteal[i] ? soundsToSteal[i].volume : 0f;
             Place();
         }
 
         void OnDisable()
         {
             // Give the world its sounds back when the hallucination ends.
-            for (int i = 0; i < soundsToSteal.Length; i++) if (soundsToSteal[i]) soundsToSteal[i].volume = baseVolumes[i];
+            if (soundsToSteal == null || baseVolumes == null) return;
+            for (int i = 0; i < soundsToSteal.Length && i < baseVolumes.Length; i++)
+                if (soundsToSteal[i]) soundsToSteal[i].volume = baseVolumes[i];
         }
 
         void Update()
@@ -52,7 +55,7 @@ namespace EchoStation.Haunt
             else unseenTimer = 0f;
 
             // Fade stolen sounds smoothly.
-            for (int i = 0; i < soundsToSteal.Length; i++)
+            for (int i = 0; soundsToSteal != null && i < soundsToSteal.Length; i++)
             {
                 if (!soundsToSteal[i]) continue;
                 float to = i < stolen ? 0f : baseVolumes[i];
@@ -68,7 +71,7 @@ namespace EchoStation.Haunt
             if (distance <= minDistance) return;
             distance = Mathf.Max(minDistance, distance - stepDistance);
             var s = transform.localScale; s.y += growPerStep * baseHeight; transform.localScale = s;
-            if (stolen < soundsToSteal.Length) stolen++;
+            if (soundsToSteal != null && stolen < soundsToSteal.Length) stolen++;
             Place();
             if (distance <= minDistance) OnReachedTarget?.Invoke();
         }

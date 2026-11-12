@@ -18,11 +18,16 @@ namespace EchoStation.Puzzles
 
         void OnEnable() { EchoPulse.OnPulse += Heard; }
         void OnDisable() { EchoPulse.OnPulse -= Heard; }
-        void Heard(Vector3 at, float r) { if (Active && Vector3.Distance(at, transform.position) < pulseRange) revealed = true; }
+        void Heard(Vector3 at, float r)
+        {
+            if (!Active || revealed || Vector3.Distance(at, transform.position) >= pulseRange) return;
+            revealed = true;
+            if (hiddenSpeaker && hiddenSpeaker.clip) hiddenSpeaker.Play();
+        }
 
         public void Interact()
         {
-            if (!Active) return;
+            if (!Active || !revealed) return;
             if (sign) sign.localRotation = Quaternion.Euler(0, 0, 80f);   // swings open
             Solve();
         }

@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using EchoStation.Player;
+using EchoStation.Puzzles;
 
 namespace EchoStation.Audio
 {
@@ -76,6 +77,9 @@ namespace EchoStation.Audio
             currentStep = step;
             StopAllCoroutines();
             distorting = false; rewinding = false; scarePlayed = false; stoppedOnce = false;
+            source.Stop();
+            if (fxSource) fxSource.Stop();
+            source.clip = null;
             source.pitch = 1f;
 
             current = entries == null ? null : System.Array.Find(entries, e => e.step == step);
@@ -90,6 +94,12 @@ namespace EchoStation.Audio
         /// <summary>Called by the Interactor when the player presses E while looking at the recorder.</summary>
         public void Interact()
         {
+            var flipPuzzle = GetComponent<CassetteFlipPuzzle>();
+            if (flipPuzzle != null && flipPuzzle.Active)
+            {
+                flipPuzzle.Interact();
+                return;
+            }
             if (distorting || rewinding) return;   // you can't stop it mid-scream
             if (!userPaused)
             {
@@ -189,5 +199,12 @@ namespace EchoStation.Audio
         }
 
         void PlayFx(AudioClip clip) { if (clip != null) fxSource.PlayOneShot(clip); }
+
+        /// <summary>Inject a spatial cue without replacing the tape bed.</summary>
+        public void PlayCue(AudioClip clip, float volume = 1f)
+        {
+            if (clip == null || fxSource == null) return;
+            fxSource.PlayOneShot(clip, Mathf.Clamp01(volume));
+        }
     }
 }

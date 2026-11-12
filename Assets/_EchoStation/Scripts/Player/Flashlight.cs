@@ -12,7 +12,7 @@ namespace EchoStation.Player
     [RequireComponent(typeof(Light))]
     public class Flashlight : MonoBehaviour
     {
-        [SerializeField] float maxIntensity = 800f;   // HDRP physical units (lumens)
+        [SerializeField] float maxIntensity = 300f;   // restrained beam; keeps near-field highlights from clipping
         [SerializeField] Color freshColor = new Color(1f, 0.97f, 0.88f);
         [SerializeField] Color drainedColor = new Color(1f, 0.72f, 0.42f);
         [SerializeField, Range(0f, 1f)] float battery = 1f;
@@ -72,7 +72,8 @@ namespace EchoStation.Player
                 else
                 {
                     beam.enabled = !beam.enabled;
-                    yield return new WaitForSeconds(Random.Range(0.18f, 0.5f)); // irregular, max ~3/s, never "three-three"
+                    // Keep every state change below 3 Hz, including on fast machines.
+                    yield return new WaitForSeconds(Random.Range(0.36f, 0.54f));
                 }
             }
             if (ReduceFlashing && !endOff)

@@ -2,7 +2,9 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using TMPro;
 using EchoStation.Player;
+using EchoStation.Haunt;
 
 namespace EchoStation.World
 {
@@ -29,7 +31,9 @@ namespace EchoStation.World
         [SerializeField] AudioClip doorLock, adhan, knocks, tapeSpin;
         [SerializeField] AudioClip k01, k02, k03, k04, k06;
         [SerializeField] Image black, titleCard, wishlistCard;   // end cards, not HUD
+        [SerializeField] TMP_Text titleText, wishlistText;
         [SerializeField] Subtitles subtitles;             // optional
+        [SerializeField] TantalStalker tantal;
         [SerializeField] UnityEvent onTantalPeak, onHandsOverEars, onEnd;
 
         bool started, near;
@@ -47,11 +51,12 @@ namespace EchoStation.World
         {
             started = true;
             ali.InputEnabled = false;
-            cameraPivot.SetPositionAndRotation(seatCamera.position, seatCamera.rotation);
+            if (cameraPivot && seatCamera) cameraPivot.SetPositionAndRotation(seatCamera.position, seatCamera.rotation);
             Play(car, doorLock);
             yield return new WaitForSeconds(2f);
 
             onTantalPeak?.Invoke();                 // TantalStalker drives the blink approach + sound removal
+            if (tantal) tantal.Blink();
             yield return new WaitForSeconds(6f);
             onHandsOverEars?.Invoke();              // 6 s, player loses control (2nd of 2 times)
             yield return new WaitForSeconds(6f);
@@ -77,17 +82,19 @@ namespace EchoStation.World
             Play(car, tapeSpin);
             yield return new WaitForSeconds(3f);
             yield return Fade(titleCard, 0f, 1f, 1.5f);
+            if (titleText) titleText.gameObject.SetActive(true);
             yield return new WaitForSeconds(4f);
             yield return Fade(titleCard, 1f, 0f, 1f);
             yield return Fade(wishlistCard, 0f, 1f, 1f);
+            if (wishlistText) wishlistText.gameObject.SetActive(true);
             onEnd?.Invoke();
         }
 
         IEnumerator Say(AudioClip clip, string ar, string en, float pauseAfter)
         {
-            if (subtitles) subtitles.Show(ar, en, clip ? clip.length + 0.4f : 2.5f);
+            if (subtitles) subtitles.Show(ar, en, clip ? clip.length + 0.4f : 3.4f);
             Play(window, clip);
-            yield return new WaitForSeconds((clip ? clip.length : 2f) + pauseAfter);
+            yield return new WaitForSeconds((clip ? clip.length : 3.4f) + pauseAfter);
         }
 
         static void Play(AudioSource s, AudioClip c) { if (s && c) s.PlayOneShot(c); }

@@ -5,17 +5,14 @@ using TMPro;
 namespace EchoStation.World
 {
     /// <summary>
-    /// Subtitles: small, bottom of screen, no speaker name, Arabic or English (or off).
-    /// Arabic needs letter shaping: install RTLTMPro (MIT, by sorencoder, via OpenUPM; check the licence) and use an
-    /// RTLTextMeshPro component as 'label'. It derives from TMP_Text, so this script works with either.
-    /// Without it, Arabic shows with disconnected letters (fine for grey-box testing).
+    /// Subtitles: small, bottom of screen, no speaker name, English or off.
     ///
     /// Distortion: when the tape plays backwards the subtitle is shown reversed and in brackets,
     /// so every sound clue also exists in writing (accessibility, docs/demo-design.md 9.1).
     /// </summary>
     public class Subtitles : MonoBehaviour
     {
-        public static string Language = "ar";   // "ar" | "en" | "off"
+        public static string Language = "en";   // "en" | "off"
 
         [SerializeField] TMP_Text label;
         [SerializeField] CanvasGroup group;
@@ -26,7 +23,7 @@ namespace EchoStation.World
         public void Show(string arabic, string english, float seconds, bool reversed)
         {
             if (Language == "off" || label == null) return;
-            string line = Language == "en" ? english : arabic;
+            string line = english;
             if (reversed) { var c = line.ToCharArray(); System.Array.Reverse(c); line = "[" + new string(c) + "]"; }
             StopAllCoroutines();
             StartCoroutine(ShowRoutine(line, seconds));
@@ -39,7 +36,7 @@ namespace EchoStation.World
         IEnumerator ShowRoutine(string line, float seconds)
         {
             label.text = line;
-            label.isRightToLeftText = Language == "ar" && label.GetType() == typeof(TextMeshProUGUI);
+            label.isRightToLeftText = false;
             yield return Fade(1f);
             yield return new WaitForSeconds(seconds);
             yield return Fade(0f);

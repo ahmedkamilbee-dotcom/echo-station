@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 using EchoStation.Loop;
+using EchoStation.Puzzles;
 
 namespace EchoStation.World
 {
@@ -49,7 +50,11 @@ namespace EchoStation.World
             if (!CorridorActive || corridor == null) return;
             if (corridor.Step != lastStep) { lastStep = corridor.Step; stepTimer = 0f; }
             stepTimer += Time.deltaTime;
-            if (stepTimer > loopCapSeconds) { stepTimer = 0f; corridor.ForceAdvance(); }
+            if (stepTimer > loopCapSeconds)
+            {
+                stepTimer = 0f;
+                if (!PuzzleBase.AnyBlocking) corridor.ForceAdvance();
+            }
 
             if (!lateHandled && Elapsed > lateCheckAt && corridor.Step < lateStepThreshold && director != null)
             {

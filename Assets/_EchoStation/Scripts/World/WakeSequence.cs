@@ -32,6 +32,8 @@ namespace EchoStation.World
         [SerializeField] Flashlight flashlight;
         [SerializeField] EchoPulse pulse;
         [SerializeField] Vector3 lyingCameraLocalPos = new Vector3(0f, 0.18f, 0f);
+        [SerializeField] float lyingPitch = 22f;
+        [SerializeField] float lyingYaw = -55f;
         [SerializeField] float lyingRoll = 78f;
 
         [Header("World")]
@@ -49,18 +51,16 @@ namespace EchoStation.World
 
         [SerializeField] bool skipForTesting;
 
-        bool started;
-
         IEnumerator Start()
         {
             if (skipForTesting) { Finish(); yield break; }
             ali.InputEnabled = false;
             var standPos = cameraPivot.localPosition;
             cameraPivot.localPosition = lyingCameraLocalPos;
-            cameraPivot.localRotation = Quaternion.Euler(0f, 0f, lyingRoll);
+            cameraPivot.localRotation = Quaternion.Euler(lyingPitch, lyingYaw, lyingRoll);
             SetEyelids(1f);
             if (bulb) bulb.enabled = false;
-            if (flashlight) flashlight.enabled = false;
+            SetFlashlight(false);
 
             float t0 = Time.time;
             yield return At(t0, 0f);   Play(drip, 0.8f);
@@ -72,18 +72,18 @@ namespace EchoStation.World
             if (generator) generator.Restore();
             yield return At(t0, 10f);  yield return FadeEyelids(1f, 0.35f, 1.2f); yield return FadeEyelids(0.35f, 0.6f, 0.4f); yield return FadeEyelids(0.6f, 0f, 1.5f);
 
-            // Wait for the player to try moving (but not before 25 s).
-            yield return At(t0, 25f);
-            while (!MoveKeyPressed()) yield return null;
+            // Let the player act on what they heard, but don't leave them lying there forever.
+            yield return At(t0, 15f);
+            while (!MoveKeyPressed() && Time.time - t0 < 22f) yield return null;
             yield return GetUp(standPos);
             ali.InputEnabled = true;
-            if (flashlight) flashlight.enabled = true;
+            SetFlashlight(true);
 
-            yield return At(t0, 45f); if (knocks) AudioSource.PlayClipAtPoint(knocks, cameraPivot.position + cameraPivot.right * 3f, 0.9f);
-            yield return At(t0, 50f);
+            yield return At(t0, 34f); if (knocks) AudioSource.PlayClipAtPoint(knocks, cameraPivot.position + cameraPivot.right * 3f, 0.9f);
+            yield return At(t0, 39f);
             if (bulb) bulb.enabled = false;
             if (flashlight) flashlight.Flicker(3f, false);
-            yield return At(t0, 55f);
+            yield return At(t0, 44f);
             if (tiltedHeadInDoorWindow) tiltedHeadInDoorWindow.SetActive(true);
             if (pulse) pulse.TryPulse();
             yield return new WaitForSeconds(2.2f);
@@ -95,9 +95,16 @@ namespace EchoStation.World
         void Finish()
         {
             if (ali) ali.InputEnabled = true;
-            if (flashlight) flashlight.enabled = true;
+            SetFlashlight(true);
             if (eyelids) eyelids.enabled = false;
-            started = true;
+        }
+
+        void SetFlashlight(bool on)
+        {
+            if (!flashlight) return;
+            flashlight.enabled = on;
+            var beam = flashlight.GetComponent<Light>();
+            if (beam) beam.enabled = on;
         }
 
         IEnumerator GetUp(Vector3 standPos)

@@ -16,7 +16,7 @@ namespace EchoStation.EditorTools
     public static class ProceduralArt
     {
         const string Dir = "Assets/_EchoStation/Art/Generated";
-        const int Size = 512;
+        const int Size = 1024;
 
         [MenuItem("EchoStation/Generate Textures and Props", priority = 1)]
         public static void Generate()
@@ -151,8 +151,50 @@ namespace EchoStation.EditorTools
             t.SetPixels(px); t.Apply();
             System.IO.File.WriteAllBytes(path, t.EncodeToPNG());
             Object.DestroyImmediate(t);
-            AssetDatabase.ImportAsset(path);
+            ImportTexture(path, false);
+            WriteNormal(name, px);
             return AssetDatabase.LoadAssetAtPath<Texture2D>(path);
+        }
+
+        static void WriteNormal(string name, Color[] source)
+        {
+            var normal = new Texture2D(Size, Size, TextureFormat.RGBA32, true, true);
+            var pixels = new Color[Size * Size];
+            int Wrap(int value) => (value + Size) % Size;
+            float HeightAt(int x, int y)
+            {
+                var c = source[Wrap(y) * Size + Wrap(x)];
+                return c.r * 0.30f + c.g * 0.59f + c.b * 0.11f;
+            }
+            const float bumpStrength = 20f;
+            for (int y = 0; y < Size; y++) for (int x = 0; x < Size; x++)
+            {
+                float dx = (HeightAt(x + 1, y) - HeightAt(x - 1, y)) * bumpStrength;
+                float dy = (HeightAt(x, y + 1) - HeightAt(x, y - 1)) * bumpStrength;
+                Vector3 n = new Vector3(-dx, -dy, 1f).normalized;
+                pixels[y * Size + x] = new Color(n.x * 0.5f + 0.5f, n.y * 0.5f + 0.5f, n.z * 0.5f + 0.5f, 1f);
+            }
+            normal.SetPixels(pixels); normal.Apply();
+            string path = $"{Dir}/N_{name}.png";
+            System.IO.File.WriteAllBytes(path, normal.EncodeToPNG());
+            Object.DestroyImmediate(normal);
+            ImportTexture(path, true);
+        }
+
+        static void ImportTexture(string path, bool normalMap)
+        {
+            AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
+            var importer = AssetImporter.GetAtPath(path) as TextureImporter;
+            if (importer == null) return;
+            importer.maxTextureSize = Size;
+            importer.mipmapEnabled = true;
+            importer.wrapMode = TextureWrapMode.Repeat;
+            importer.filterMode = FilterMode.Trilinear;
+            importer.anisoLevel = 4;
+            importer.textureCompression = TextureImporterCompression.CompressedHQ;
+            importer.textureType = normalMap ? TextureImporterType.NormalMap : TextureImporterType.Default;
+            if (!normalMap) importer.sRGBTexture = true;
+            importer.SaveAndReimport();
         }
 
         static Material Mat(string name, Texture2D tex, float smooth, Color? tint = null)
@@ -161,6 +203,13 @@ namespace EchoStation.EditorTools
             var m = AssetDatabase.LoadAssetAtPath<Material>(path);
             if (m == null) { m = new Material(Shader.Find("HDRP/Lit")); AssetDatabase.CreateAsset(m, path); }
             if (tex) m.SetTexture("_BaseColorMap", tex);
+            var normal = AssetDatabase.LoadAssetAtPath<Texture2D>($"{Dir}/N_{name}.png");
+            if (normal)
+            {
+                m.SetTexture("_NormalMap", normal);
+                m.SetFloat("_NormalScale", 0.65f);
+                m.EnableKeyword("_NORMALMAP");
+            }
             m.SetColor("_BaseColor", tint ?? Color.white);
             m.SetFloat("_Smoothness", smooth);
             EditorUtility.SetDirty(m);

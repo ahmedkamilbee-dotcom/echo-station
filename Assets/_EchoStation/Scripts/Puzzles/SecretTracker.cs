@@ -21,7 +21,7 @@ namespace EchoStation.Puzzles
         [SerializeField] GameObject fifthCassette;   // appears in the empty slot in the workshop
         static SecretTracker instance;
 
-        void Awake() { instance = this; found.Clear(); listened.Clear(); if (fifthCassette) fifthCassette.SetActive(false); }
+        void Awake() { instance = this; found.Clear(); listened.Clear(); CarEnding.HasFifthCassette = false; if (fifthCassette) fifthCassette.SetActive(false); }
 
         public static void Found(int id) { if (found.Add(id)) Debug.Log("[Secret] " + id); }
         public static bool Has(int id) => found.Contains(id);

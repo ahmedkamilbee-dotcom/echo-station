@@ -46,15 +46,26 @@ namespace EchoStation.Loop
             var ali = other.GetComponent<AliController>();
             if (ali == null) return;
 
+            bool tapeRunning = tape == null || (tape.HasEntryFor(Step) && tape.IsPlaying);
+            bool canAdvance = tapeRunning && !EchoStation.Puzzles.PuzzleBase.AnyBlocking
+                              && (director == null || director.ForwardPassIsCorrect());
+
+            // The last pass breaks into the pump hall. Keep Ali on the far side of the
+            // loop so he can walk through the newly revealed door instead of teleporting back.
+            if (canAdvance && director != null && Step >= director.StepCount - 1)
+            {
+                broken = true;
+                OnCorridorBroken?.Invoke();
+                return;
+            }
+
             // Relative position & yaw from exit -> entry.
             Vector3 local = exitAnchor.InverseTransformPoint(ali.transform.position);
             Vector3 target = entryAnchor.TransformPoint(local);
             float yawDelta = entryAnchor.eulerAngles.y - exitAnchor.eulerAngles.y;
             ali.Teleport(target, yawDelta);
 
-            bool tapeRunning = (tape == null || !tape.HasEntryFor(Step) || tape.IsPlaying) && !EchoStation.Puzzles.PuzzleBase.AnyBlocking;
-            bool correct = director == null || director.ForwardPassIsCorrect();
-            if (tapeRunning && correct) Advance();
+            if (canAdvance) Advance();
         }
 
         /// <summary>Called by TurnBackTrigger when the player turns back on an anomaly that requires it.</summary>
@@ -65,7 +76,10 @@ namespace EchoStation.Loop
         }
 
         /// <summary>Used by DemoClock when the player lingers too long in one loop.</summary>
-        public void ForceAdvance() { if (!broken) Advance(); }
+        public void ForceAdvance()
+        {
+            if (!broken && !EchoStation.Puzzles.PuzzleBase.AnyBlocking) Advance();
+        }
 
         void Advance()
         {

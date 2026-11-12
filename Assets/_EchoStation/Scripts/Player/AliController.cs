@@ -67,6 +67,9 @@ namespace EchoStation.Player
             var kb = Keyboard.current;
             var mouse = Mouse.current;
             if (kb == null || mouse == null) return;
+            // Scripted camera poses (the wake-up and the car) must not be overwritten by
+            // the controller's normal look and head-bob update.
+            if (!InputEnabled) { IsMoving = false; return; }
 
             Vector2 move = Vector2.zero;
             if (InputEnabled)

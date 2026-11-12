@@ -10,9 +10,9 @@ namespace EchoStation.UI
     /// The only screens in the game (no in-game HUD):
     ///  1. Warning screen before the first frame: photosensitivity warning + "Reduce flashing" toggle + continue.
     ///  2. Pause menu (Esc): resume, options, quit.
-    ///  3. Options: mouse sensitivity, subtitles (Arabic / English / off), reduce flashing, breath hold as toggle.
+    ///  3. Options: mouse sensitivity, English subtitles on/off, reduce flashing, breath hold as toggle.
     /// Settings are saved in PlayerPrefs. Build the canvases in the scene and wire the references.
-    /// Texts are set in the scene (Arabic + English); this script only handles behaviour.
+    /// The demo UI is English-only because the current TMP setup does not shape Arabic text correctly.
     /// </summary>
     public class GameMenus : MonoBehaviour
     {
@@ -28,13 +28,14 @@ namespace EchoStation.UI
 
         [Header("Options")]
         [SerializeField] Slider sensitivity;           // 0.3 .. 2
-        [SerializeField] Dropdown subtitles;           // 0 Arabic, 1 English, 2 Off
+        [SerializeField] Dropdown subtitles;           // optional legacy field; the demo exposes English / Off buttons
         [SerializeField] Toggle reduceFlashing;
         [SerializeField] Toggle breathToggleMode;
 
         [SerializeField] AliController ali;
 
         bool paused, warningDone;
+        float warningStartedAt;
 
         void Awake()
         {
@@ -42,6 +43,7 @@ namespace EchoStation.UI
             if (warningScreen)
             {
                 warningScreen.SetActive(true);
+                warningStartedAt = Time.unscaledTime;
                 Time.timeScale = 0f;
                 AudioListener.pause = true;
                 Cursor.lockState = CursorLockMode.None; Cursor.visible = true;
@@ -51,7 +53,7 @@ namespace EchoStation.UI
             else warningDone = true;
 
             if (sensitivity) sensitivity.onValueChanged.AddListener(v => { AliController.SensitivityScale = v; Save(); });
-            if (subtitles) subtitles.onValueChanged.AddListener(i => { Subtitles.Language = i == 0 ? "ar" : i == 1 ? "en" : "off"; Save(); });
+            if (subtitles) subtitles.onValueChanged.AddListener(i => { Subtitles.Language = i == 0 ? "en" : "off"; Save(); });
             if (reduceFlashing) reduceFlashing.onValueChanged.AddListener(b => { Flashlight.ReduceFlashing = b; Save(); });
             if (breathToggleMode) breathToggleMode.onValueChanged.AddListener(b => { BreathHold.ToggleMode = b; Save(); });
             if (pauseScreen) pauseScreen.SetActive(false);
@@ -60,9 +62,10 @@ namespace EchoStation.UI
 
         void CloseWarning()
         {
+            if (warningDone) return;
             if (warningReduceFlashing) Flashlight.ReduceFlashing = warningReduceFlashing.isOn;
             Save();
-            warningScreen.SetActive(false);
+            if (warningScreen) warningScreen.SetActive(false);
             warningDone = true;
             Time.timeScale = 1f;
             AudioListener.pause = false;
@@ -72,7 +75,33 @@ namespace EchoStation.UI
         void Update()
         {
             var kb = Keyboard.current;
-            if (!warningDone || kb == null) return;
+            if (kb == null) return;
+            if (!warningDone)
+            {
+                // Avoid trapping the player at the opening if a platform drops UI input.
+                if (Time.unscaledTime - warningStartedAt >= 8f)
+                {
+                    CloseWarning();
+                    return;
+                }
+
+                // Keep the opening usable even if the EventSystem misses a pointer or submit event.
+                var mouse = Mouse.current;
+                if (mouse != null && mouse.leftButton.wasPressedThisFrame && warningContinue)
+                {
+                    var buttonRect = warningContinue.transform as RectTransform;
+                    if (buttonRect != null && RectTransformUtility.RectangleContainsScreenPoint(
+                            buttonRect, mouse.position.ReadValue(), null))
+                    {
+                        CloseWarning();
+                        return;
+                    }
+                }
+
+                if (kb.enterKey.wasPressedThisFrame || kb.numpadEnterKey.wasPressedThisFrame || kb.spaceKey.wasPressedThisFrame)
+                    CloseWarning();
+                return;
+            }
             if (kb.escapeKey.wasPressedThisFrame)
             {
                 if (optionsScreen && optionsScreen.activeSelf) CloseOptions();
@@ -89,7 +118,8 @@ namespace EchoStation.UI
             Cursor.lockState = p ? CursorLockMode.None : CursorLockMode.Locked;
             Cursor.visible = p;
             if (ali) ali.enabled = !p;
-            foreach (var m in disableWhilePaused) if (m) m.enabled = !p;
+            if (disableWhilePaused != null)
+                foreach (var m in disableWhilePaused) if (m) m.enabled = !p;
         }
 
         public void Resume() => SetPaused(false);
@@ -99,7 +129,7 @@ namespace EchoStation.UI
             if (pauseScreen) pauseScreen.SetActive(false);
             if (optionsScreen) optionsScreen.SetActive(true);
             if (sensitivity) sensitivity.SetValueWithoutNotify(AliController.SensitivityScale);
-            if (subtitles) subtitles.SetValueWithoutNotify(Subtitles.Language == "ar" ? 0 : Subtitles.Language == "en" ? 1 : 2);
+            if (subtitles) subtitles.SetValueWithoutNotify(Subtitles.Language == "en" ? 0 : 1);
             if (reduceFlashing) reduceFlashing.SetIsOnWithoutNotify(Flashlight.ReduceFlashing);
             if (breathToggleMode) breathToggleMode.SetIsOnWithoutNotify(BreathHold.ToggleMode);
         }
@@ -122,7 +152,9 @@ namespace EchoStation.UI
         static void Load()
         {
             AliController.SensitivityScale = PlayerPrefs.GetFloat("es_sens", 1f);
-            Subtitles.Language = PlayerPrefs.GetString("es_subs", "ar");
+            // Older demo preferences may contain "ar"; map those saves to English because this TMP UI is English-only.
+            string savedSubtitleMode = PlayerPrefs.GetString("es_subs", "en");
+            Subtitles.Language = savedSubtitleMode == "off" ? "off" : "en";
             Flashlight.ReduceFlashing = PlayerPrefs.GetInt("es_reduceFlash", 0) == 1;
             BreathHold.ToggleMode = PlayerPrefs.GetInt("es_breathToggle", 0) == 1;
         }
